@@ -1,0 +1,36 @@
+# ==============================================================================
+# CuraPharm AI Process Intelligence Platform - Pinned Dependencies
+# Target Python Version: 3.9.13 (Windows 64-bit Compatible)
+# ==============================================================================
+
+# Google GenAI Official SDK (Modern official SDK)
+google-genai==1.47.0
+
+# Backend API Framework & ASGI Server
+fastapi==0.115.6
+uvicorn==0.34.0
+
+# Data Validation, Serialization, and Settings Management
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# Database ORM & Persistence Layer
+# (Pinned greenlet provides prebuilt Windows binary wheel for Python 3.9)
+greenlet==3.1.1
+sqlalchemy==2.0.36
+
+# Frontend Interactive Dashboard & UI
+streamlit==1.41.1
+
+# HTTP Client for PubMed & OpenFDA External APIs
+httpx==0.28.1
+
+# Environment Configuration Loader
+python-dotenv==1.0.1
+
+# Interactive Visualization (Dashboard charts)
+plotly==5.24.1
+
+# Automated Testing Suite & Async Test Runner
+pytest==8.3.4
+pytest-asyncio==0.25.0

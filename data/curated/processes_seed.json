@@ -1,0 +1,902 @@
+[
+  {
+    "process_code": "P001",
+    "name": "Target identification",
+    "domain": "Research & Drug Discovery",
+    "description": "Identify biological targets whose modulation could address a defined disease mechanism or unmet patient need.",
+    "business_purpose": "Focus discovery investment on targets with credible biology, tractable chemistry, and potential therapeutic value.",
+    "key_activities": "Review disease biology, integrate omics findings, assess target tractability, and document the target rationale.",
+    "current_challenges": "Evidence is distributed across studies, target hypotheses can be difficult to reproduce, and early decisions often rely on incomplete data."
+  },
+  {
+    "process_code": "P002",
+    "name": "Target validation",
+    "domain": "Research & Drug Discovery",
+    "description": "Test whether changing a proposed biological target produces a measurable disease-relevant effect in suitable experimental systems.",
+    "business_purpose": "Reduce the risk of advancing targets that cannot deliver meaningful pharmacological or clinical benefit.",
+    "key_activities": "Design perturbation experiments, compare controls, assess genetic and pharmacological evidence, and review reproducibility.",
+    "current_challenges": "Results may vary by model, assay artifacts can mislead decisions, and independent confirmation takes substantial laboratory time."
+  },
+  {
+    "process_code": "P003",
+    "name": "Disease biology landscape review",
+    "domain": "Research & Drug Discovery",
+    "description": "Synthesize current understanding of disease pathways, patient subtypes, treatment gaps, and competing biological hypotheses.",
+    "business_purpose": "Establish a shared scientific foundation for selecting discovery programs and differentiating therapeutic approaches.",
+    "key_activities": "Search scientific literature, compare disease models, map pathway relationships, and record unresolved questions.",
+    "current_challenges": "The literature is rapidly expanding, terminology is inconsistent, and important findings may be difficult to compare across models."
+  },
+  {
+    "process_code": "P004",
+    "name": "Scientific literature review",
+    "domain": "Research & Drug Discovery",
+    "description": "Locate, screen, and summarize published scientific findings relevant to a discovery question or therapeutic hypothesis.",
+    "business_purpose": "Make prior knowledge discoverable so teams can design stronger experiments and avoid unnecessary duplication.",
+    "key_activities": "Define search terms, screen abstracts, assess relevance, extract findings, and maintain a review record.",
+    "current_challenges": "Search results are noisy, full-text access varies, and extracting comparable conclusions from diverse publications is labor intensive."
+  },
+  {
+    "process_code": "P005",
+    "name": "Biomarker hypothesis generation",
+    "domain": "Research & Drug Discovery",
+    "description": "Propose measurable biological features that may indicate disease state, treatment response, or patient selection opportunity.",
+    "business_purpose": "Support translational strategy and increase the chance that development programs can measure mechanism and response.",
+    "key_activities": "Review molecular data, compare responder patterns, define candidate markers, and identify assays for confirmation.",
+    "current_challenges": "Candidate signals may be weak or confounded, sample cohorts are limited, and analytical validity is not yet established."
+  },
+  {
+    "process_code": "P006",
+    "name": "Hit identification",
+    "domain": "Research & Drug Discovery",
+    "description": "Find chemical or biological starting points that demonstrate activity against a validated target or assay system.",
+    "business_purpose": "Create a credible set of starting compounds for optimization into viable drug candidates.",
+    "key_activities": "Run screening campaigns, confirm primary hits, remove artifacts, and rank compounds for follow-up testing.",
+    "current_challenges": "Large result volumes, false positives, assay variability, and limited material can delay reliable hit confirmation."
+  },
+  {
+    "process_code": "P007",
+    "name": "Virtual screening",
+    "domain": "Research & Drug Discovery",
+    "description": "Prioritize compounds for experimental testing using structure-based, ligand-based, or computational screening methods.",
+    "business_purpose": "Expand chemical exploration while reducing the cost and time required for broad physical screening campaigns.",
+    "key_activities": "Prepare compound libraries, apply computational filters, rank candidates, and select compounds for laboratory confirmation.",
+    "current_challenges": "Predictions depend on model quality and input structures, chemical space is enormous, and computational ranking can create false confidence."
+  },
+  {
+    "process_code": "P008",
+    "name": "Lead optimization",
+    "domain": "Research & Drug Discovery",
+    "description": "Iteratively improve promising compounds across potency, selectivity, exposure, safety, and developability attributes.",
+    "business_purpose": "Convert early hits into balanced candidates that can meet a defined development profile.",
+    "key_activities": "Design analogues, review structure-activity relationships, run assays, compare developability data, and select next compounds.",
+    "current_challenges": "Improving one property can degrade another, experimental cycles are slow, and decisions require integrating many data types."
+  },
+  {
+    "process_code": "P009",
+    "name": "Assay development",
+    "domain": "Research & Drug Discovery",
+    "description": "Design and qualify experimental assays that reliably measure target activity, cellular response, or compound properties.",
+    "business_purpose": "Provide dependable measurements for screening, optimization, and scientific decision making.",
+    "key_activities": "Define assay objectives, select reagents, optimize conditions, assess controls, and document performance characteristics.",
+    "current_challenges": "Assays can be sensitive to operator and plate effects, qualification criteria vary, and transfer between laboratories is difficult."
+  },
+  {
+    "process_code": "P010",
+    "name": "In vitro efficacy assessment",
+    "domain": "Preclinical Development",
+    "description": "Evaluate candidate activity and mechanism in cell-based or biochemical models before progression to more complex studies.",
+    "business_purpose": "Identify candidates with a credible efficacy signal and characterize the conditions under which activity occurs.",
+    "key_activities": "Plan experiments, run dose-response studies, analyze controls, compare mechanisms, and document reproducibility.",
+    "current_challenges": "Cell models may not represent human disease, results can be operator-dependent, and cross-study comparability is limited."
+  },
+  {
+    "process_code": "P011",
+    "name": "ADME profiling",
+    "domain": "Preclinical Development",
+    "description": "Characterize absorption, distribution, metabolism, and excretion properties of candidate compounds.",
+    "business_purpose": "Select candidates with exposure and disposition characteristics that support safe and effective dosing.",
+    "key_activities": "Plan ADME panels, review permeability and metabolism results, investigate interactions, and compare candidates.",
+    "current_challenges": "Data comes from multiple models, translation to humans is uncertain, and late findings can require extensive redesign."
+  },
+  {
+    "process_code": "P012",
+    "name": "Preclinical pharmacokinetic study design",
+    "domain": "Preclinical Development",
+    "description": "Design animal and analytical studies to understand candidate exposure, dose relationships, and pharmacokinetic behavior.",
+    "business_purpose": "Generate interpretable exposure data for dose selection, safety interpretation, and development planning.",
+    "key_activities": "Define sampling schedules, select species and routes, coordinate bioanalysis, and document study assumptions.",
+    "current_challenges": "Sampling constraints, assay capacity, species differences, and changing candidate formulations complicate study design."
+  },
+  {
+    "process_code": "P013",
+    "name": "Nonclinical safety strategy",
+    "domain": "Preclinical Development",
+    "description": "Plan the package of toxicology, safety pharmacology, and other nonclinical studies needed to support development decisions.",
+    "business_purpose": "Identify and manage safety risks while meeting expectations for progression toward first-in-human studies.",
+    "key_activities": "Review candidate risks, map required studies, assess species relevance, and align timelines with development milestones.",
+    "current_challenges": "Requirements vary by program, study capacity is constrained, and emerging findings can disrupt an integrated plan."
+  },
+  {
+    "process_code": "P014",
+    "name": "GLP toxicology study management",
+    "domain": "Preclinical Development",
+    "description": "Coordinate regulated toxicology studies that assess dose-related effects and support the nonclinical safety package.",
+    "business_purpose": "Produce reliable, auditable safety evidence for internal decisions and regulatory submissions.",
+    "key_activities": "Approve protocols, coordinate facilities, monitor milestones, review deviations, and manage study reports.",
+    "current_challenges": "Vendor dependencies, animal and material logistics, protocol deviations, and detailed compliance records create operational burden."
+  },
+  {
+    "process_code": "P015",
+    "name": "In vivo efficacy study management",
+    "domain": "Preclinical Development",
+    "description": "Plan and execute animal efficacy studies that test candidate performance in disease-relevant models.",
+    "business_purpose": "Assess whether in vitro findings translate into a meaningful effect in a more complex biological system.",
+    "key_activities": "Select models, define endpoints, coordinate dosing and observations, analyze results, and document limitations.",
+    "current_challenges": "Model variability, small cohorts, ethical constraints, and inconsistent endpoints can make conclusions difficult to generalize."
+  },
+  {
+    "process_code": "P016",
+    "name": "Immunogenicity assessment",
+    "domain": "Preclinical Development",
+    "description": "Assess whether a biologic or related product may trigger an immune response that affects safety, exposure, or efficacy.",
+    "business_purpose": "Identify immune-related risks early and inform assay, dosing, and development strategy.",
+    "key_activities": "Select assays, review sample plans, interpret antibody responses, compare species findings, and record conclusions.",
+    "current_challenges": "Assay sensitivity and specificity vary, transient responses are difficult to interpret, and clinical translation is uncertain."
+  },
+  {
+    "process_code": "P017",
+    "name": "Preclinical candidate selection",
+    "domain": "Preclinical Development",
+    "description": "Evaluate candidate molecules against a defined target product profile and recommend which candidate should enter development.",
+    "business_purpose": "Make a transparent portfolio decision using integrated efficacy, safety, exposure, and manufacturability evidence.",
+    "key_activities": "Compile study results, compare trade-offs, review risks, document decision criteria, and obtain governance approval.",
+    "current_challenges": "Evidence matures at different speeds, trade-offs are subjective, and teams may disagree on risk tolerance."
+  },
+  {
+    "process_code": "P018",
+    "name": "Clinical development plan preparation",
+    "domain": "Clinical Development",
+    "description": "Define the sequence, objectives, design concepts, and decision points for clinical development of a medicine.",
+    "business_purpose": "Align scientific, operational, regulatory, and commercial assumptions around a coherent development strategy.",
+    "key_activities": "Set milestones, evaluate evidence, map indications, plan studies, and document go/no-go decision points.",
+    "current_challenges": "Plans depend on uncertain evidence, changing competitive conditions, and cross-functional alignment across long time horizons."
+  },
+  {
+    "process_code": "P019",
+    "name": "Clinical trial protocol development",
+    "domain": "Clinical Development",
+    "description": "Translate clinical objectives into a protocol specifying design, population, interventions, assessments, and operational requirements.",
+    "business_purpose": "Create a scientifically valid and operationally feasible study that can answer its primary questions.",
+    "key_activities": "Define endpoints, eligibility, visit schedule, safety monitoring, statistical assumptions, and stakeholder review cycles.",
+    "current_challenges": "Protocol complexity can burden sites and patients, revisions are costly, and scientific and operational priorities may conflict."
+  },
+  {
+    "process_code": "P020",
+    "name": "Clinical endpoint strategy",
+    "domain": "Clinical Development",
+    "description": "Select and justify primary, secondary, and exploratory endpoints that measure meaningful treatment effects in a target population.",
+    "business_purpose": "Ensure clinical studies generate interpretable evidence that addresses patient, regulator, and decision-maker needs.",
+    "key_activities": "Review disease measures, consult experts, assess endpoint feasibility, define estimands, and document rationale.",
+    "current_challenges": "Endpoints may be difficult to measure consistently, patient relevance can be debated, and regulatory expectations evolve."
+  },
+  {
+    "process_code": "P021",
+    "name": "Statistical analysis plan development",
+    "domain": "Clinical Development",
+    "description": "Specify planned statistical methods, populations, estimands, handling of missing data, and analysis outputs for a clinical study.",
+    "business_purpose": "Protect study credibility by defining analyses before unblinding and reducing avoidable interpretation disputes.",
+    "key_activities": "Define analysis sets, methods, sensitivity analyses, table shells, programming requirements, and review approvals.",
+    "current_challenges": "Late protocol changes, complex estimands, data quality issues, and cross-functional review can delay finalization."
+  },
+  {
+    "process_code": "P022",
+    "name": "Clinical trial feasibility assessment",
+    "domain": "Clinical Development",
+    "description": "Assess whether a proposed study can recruit the required population and operate within planned time, cost, and site constraints.",
+    "business_purpose": "Improve study planning by identifying recruitment, country, site, and operational risks before commitment.",
+    "key_activities": "Review epidemiology, survey investigators, estimate enrollment, assess competing trials, and document assumptions.",
+    "current_challenges": "Feasibility inputs are often estimates, market conditions shift, and sites may overstate capacity or interest."
+  },
+  {
+    "process_code": "P023",
+    "name": "Clinical supply strategy",
+    "domain": "Clinical Development",
+    "description": "Define the product quantities, packaging, labeling, and distribution approach needed to support planned clinical studies.",
+    "business_purpose": "Ensure investigational product availability without excessive waste, expiry, or avoidable supply cost.",
+    "key_activities": "Estimate demand, set packaging strategy, align manufacturing slots, plan labeling, and establish replenishment rules.",
+    "current_challenges": "Enrollment uncertainty, country-specific requirements, long lead times, and temperature constraints complicate planning."
+  },
+  {
+    "process_code": "P024",
+    "name": "Investigator brochure preparation",
+    "domain": "Clinical Development",
+    "description": "Compile current nonclinical and clinical information about an investigational product for investigators and study teams.",
+    "business_purpose": "Provide a controlled scientific reference that supports safe and informed conduct of the clinical study.",
+    "key_activities": "Collect source sections, reconcile safety and efficacy data, update references, route reviews, and control revisions.",
+    "current_challenges": "Information changes frequently, source ownership is distributed, and consistency across documents requires extensive review."
+  },
+  {
+    "process_code": "P025",
+    "name": "Clinical data standards planning",
+    "domain": "Clinical Development",
+    "description": "Define standards for collecting, transforming, naming, and exchanging data across clinical studies and systems.",
+    "business_purpose": "Improve data consistency, downstream analysis, submission readiness, and reuse across the development portfolio.",
+    "key_activities": "Map data domains, define conventions, review controlled terminology, align vendors, and publish standards guidance.",
+    "current_challenges": "Legacy systems differ, standards evolve, and vendor implementations may not fully follow agreed conventions."
+  },
+  {
+    "process_code": "P026",
+    "name": "Clinical study report preparation",
+    "domain": "Clinical Development",
+    "description": "Assemble the formal report of study design, conduct, results, safety findings, and interpretation after clinical data are finalized.",
+    "business_purpose": "Create a complete and auditable record that supports regulatory review and internal development decisions.",
+    "key_activities": "Coordinate tables and figures, draft sections, reconcile data, manage reviews, and finalize controlled outputs.",
+    "current_challenges": "Many contributors and source systems must align, late data corrections create rework, and traceability is demanding."
+  },
+  {
+    "process_code": "P027",
+    "name": "Clinical site selection",
+    "domain": "Clinical Operations",
+    "description": "Identify and evaluate sites capable of enrolling the target population and delivering a study according to protocol and quality expectations.",
+    "business_purpose": "Build a site network that supports timely recruitment, reliable data, and compliant study conduct.",
+    "key_activities": "Assess site experience, capacity, patient access, performance history, facilities, and investigator interest.",
+    "current_challenges": "Site information is incomplete, forecasts are uncertain, and high-demand investigators may be overcommitted."
+  },
+  {
+    "process_code": "P028",
+    "name": "Clinical site activation",
+    "domain": "Clinical Operations",
+    "description": "Complete the contracts, regulatory documents, training, system access, and readiness checks required before a site can enroll.",
+    "business_purpose": "Open sites in a controlled manner while protecting participants and maintaining study compliance.",
+    "key_activities": "Collect essential documents, finalize agreements, conduct training, verify facilities, and approve activation.",
+    "current_challenges": "Contract negotiations, local approvals, missing documents, and multiple study systems create unpredictable cycle times."
+  },
+  {
+    "process_code": "P029",
+    "name": "Patient recruitment management",
+    "domain": "Clinical Operations",
+    "description": "Plan and monitor activities that identify, screen, enroll, and retain eligible participants for a clinical study.",
+    "business_purpose": "Meet enrollment objectives while protecting participant experience and ensuring eligibility criteria are followed.",
+    "key_activities": "Track recruitment metrics, coordinate outreach, review screening barriers, support sites, and adjust plans.",
+    "current_challenges": "Eligible populations may be small, competing studies affect enrollment, and recruitment performance varies widely by site."
+  },
+  {
+    "process_code": "P030",
+    "name": "Informed consent management",
+    "domain": "Clinical Operations",
+    "description": "Control the preparation, approval, delivery, documentation, and updating of informed consent materials and processes.",
+    "business_purpose": "Ensure participants receive understandable information and provide consent in an ethical and compliant manner.",
+    "key_activities": "Prepare local materials, manage translations, train sites, document consent, and implement approved updates.",
+    "current_challenges": "Language and literacy needs vary, amendments require rapid updates, and documentation errors can be significant."
+  },
+  {
+    "process_code": "P031",
+    "name": "Randomization and blinding management",
+    "domain": "Clinical Operations",
+    "description": "Configure and control participant allocation, treatment masking, emergency unblinding, and related study procedures.",
+    "business_purpose": "Protect study validity and participant safety by ensuring treatment assignment is controlled and documented.",
+    "key_activities": "Review allocation specifications, test systems, manage access, handle unblinding requests, and reconcile records.",
+    "current_challenges": "Complex treatment designs, urgent safety situations, system defects, and access errors create operational risk."
+  },
+  {
+    "process_code": "P032",
+    "name": "Clinical trial monitoring",
+    "domain": "Clinical Operations",
+    "description": "Review site performance, participant safety, data quality, and protocol compliance throughout study conduct.",
+    "business_purpose": "Detect and address issues early so participant protection and data reliability are maintained.",
+    "key_activities": "Plan monitoring, review risk indicators, conduct visits, document findings, and track corrective actions.",
+    "current_challenges": "Large study footprints, travel constraints, inconsistent source records, and prioritization of signals challenge monitoring teams."
+  },
+  {
+    "process_code": "P033",
+    "name": "Trial master file management",
+    "domain": "Clinical Operations",
+    "description": "Collect, classify, quality-check, and maintain essential clinical trial records in the trial master file.",
+    "business_purpose": "Preserve evidence that the study was conducted appropriately and remains inspection ready.",
+    "key_activities": "Define filing plans, ingest documents, perform quality checks, reconcile missing records, and manage access.",
+    "current_challenges": "Documents arrive from many parties, metadata quality varies, and late filing creates inspection and oversight risk."
+  },
+  {
+    "process_code": "P034",
+    "name": "Clinical sample logistics",
+    "domain": "Clinical Operations",
+    "description": "Coordinate collection, labeling, shipment, storage, and tracking of biological samples generated during clinical studies.",
+    "business_purpose": "Preserve sample integrity and ensure laboratories receive the right materials with complete chain-of-custody information.",
+    "key_activities": "Define handling instructions, coordinate couriers, track shipments, manage temperature excursions, and reconcile receipt.",
+    "current_challenges": "Country restrictions, shipping delays, limited stability windows, and inconsistent site handling can compromise samples."
+  },
+  {
+    "process_code": "P035",
+    "name": "Clinical data and safety reconciliation",
+    "domain": "Clinical Operations",
+    "description": "Compare safety and clinical data across operational systems to identify missing, inconsistent, or unresolved records.",
+    "business_purpose": "Improve participant safety oversight and ensure data used for analysis and reporting is complete and consistent.",
+    "key_activities": "Compare case and database records, investigate discrepancies, route queries, and document resolution.",
+    "current_challenges": "Different update schedules, identifiers, coding conventions, and ownership boundaries create recurring reconciliation work."
+  },
+  {
+    "process_code": "P036",
+    "name": "Clinical study closeout",
+    "domain": "Clinical Operations",
+    "description": "Complete final site activities, records reconciliation, investigational product disposition, and closure documentation after study conduct.",
+    "business_purpose": "Close sites in a controlled way and preserve complete records for analysis, reporting, and future inspection.",
+    "key_activities": "Confirm final visits, reconcile documents and supplies, resolve open issues, archive records, and issue closeout approvals.",
+    "current_challenges": "Outstanding queries, missing documents, local timelines, and coordination across vendors can extend closeout substantially."
+  },
+  {
+    "process_code": "P037",
+    "name": "Regulatory intelligence monitoring",
+    "domain": "Regulatory Affairs",
+    "description": "Track regulatory changes, guidance, precedents, and authority expectations relevant to products and development programs.",
+    "business_purpose": "Anticipate regulatory impacts and adapt plans before changes create submission or compliance delays.",
+    "key_activities": "Monitor authority communications, assess relevance, summarize implications, and distribute controlled updates.",
+    "current_challenges": "Information arrives from many jurisdictions, interpretation requires expertise, and material changes may be ambiguous."
+  },
+  {
+    "process_code": "P038",
+    "name": "IND or CTA strategy development",
+    "domain": "Regulatory Affairs",
+    "description": "Define the regulatory path, submission sequence, and authority interactions needed to begin clinical testing in selected regions.",
+    "business_purpose": "Reduce regulatory uncertainty and align development activities with requirements for clinical authorization.",
+    "key_activities": "Assess regional requirements, map the dossier, plan meetings, identify gaps, and align cross-functional owners.",
+    "current_challenges": "Requirements differ by region, agency feedback can change plans, and technical content matures on different schedules."
+  },
+  {
+    "process_code": "P039",
+    "name": "Regulatory submission dossier authoring",
+    "domain": "Regulatory Affairs",
+    "description": "Coordinate preparation and review of technical and administrative content for a regulatory submission.",
+    "business_purpose": "Deliver a complete, coherent, and traceable dossier that allows authorities to evaluate the product.",
+    "key_activities": "Assign content owners, draft modules, reconcile source data, manage reviews, and control approved versions.",
+    "current_challenges": "Large document volumes, late inputs, repeated review cycles, and inconsistent source terminology create rework."
+  },
+  {
+    "process_code": "P040",
+    "name": "eCTD publishing and validation",
+    "domain": "Regulatory Affairs",
+    "description": "Assemble, hyperlink, validate, and publish electronic submission content according to regional technical specifications.",
+    "business_purpose": "Ensure the submission can be technically received and navigated by health authorities without avoidable defects.",
+    "key_activities": "Build sequences, apply metadata, create links, run validation checks, resolve errors, and package the submission.",
+    "current_challenges": "Technical rules are detailed, source documents change late, and small metadata or hyperlink errors can delay dispatch."
+  },
+  {
+    "process_code": "P041",
+    "name": "Health authority question management",
+    "domain": "Regulatory Affairs",
+    "description": "Coordinate intake, assignment, drafting, review, and submission of responses to questions from health authorities.",
+    "business_purpose": "Provide accurate, timely, and consistent responses that keep regulatory review moving.",
+    "key_activities": "Log questions, assign owners, gather evidence, draft responses, coordinate approvals, and track commitments.",
+    "current_challenges": "Response windows can be short, questions cross technical areas, and review comments may arrive from many stakeholders."
+  },
+  {
+    "process_code": "P042",
+    "name": "Regulatory meeting briefing package",
+    "domain": "Regulatory Affairs",
+    "description": "Prepare objectives, questions, background, and supporting materials for formal interactions with health authorities.",
+    "business_purpose": "Use agency meetings efficiently to resolve uncertainty and obtain actionable feedback on development plans.",
+    "key_activities": "Define meeting objectives, draft questions, compile evidence, coordinate rehearsals, and record follow-up actions.",
+    "current_challenges": "Time is limited, internal views may conflict, and unclear questions can produce feedback that is difficult to operationalize."
+  },
+  {
+    "process_code": "P043",
+    "name": "Product labeling management",
+    "domain": "Regulatory Affairs",
+    "description": "Develop, negotiate, approve, and maintain product labeling and prescribing information across applicable markets.",
+    "business_purpose": "Communicate authorized benefits, risks, and use instructions accurately and consistently to healthcare stakeholders.",
+    "key_activities": "Review evidence, draft text, compare regional requirements, coordinate authority comments, and control revisions.",
+    "current_challenges": "Label text is highly scrutinized, regional differences create complexity, and safety updates can require rapid coordination."
+  },
+  {
+    "process_code": "P044",
+    "name": "Post-approval variation submission",
+    "domain": "Regulatory Affairs",
+    "description": "Prepare and submit regulatory changes related to an approved product, such as manufacturing, quality, or labeling updates.",
+    "business_purpose": "Maintain approvals while implementing necessary product, process, or supply changes compliantly.",
+    "key_activities": "Classify changes, assess impact, compile supporting modules, coordinate approvals, and track authority outcomes.",
+    "current_challenges": "Classification differs by region, source data may be incomplete, and implementation timing depends on multiple approvals."
+  },
+  {
+    "process_code": "P045",
+    "name": "Regulatory commitment tracking",
+    "domain": "Regulatory Affairs",
+    "description": "Record, assign, monitor, and close commitments made to health authorities during submissions, reviews, or approvals.",
+    "business_purpose": "Prevent missed obligations and provide reliable visibility into regulatory responsibilities across the portfolio.",
+    "key_activities": "Capture commitments, define owners and dates, monitor progress, escalate risks, and archive completion evidence.",
+    "current_challenges": "Commitments are embedded in correspondence and approvals, ownership can change, and due dates may span years."
+  },
+  {
+    "process_code": "P046",
+    "name": "Adverse event case intake",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Receive and register reports of suspected adverse events from patients, healthcare professionals, partners, and authorities.",
+    "business_purpose": "Ensure potential safety information enters the safety system promptly for assessment and regulatory compliance.",
+    "key_activities": "Capture reporter and patient details, identify products and events, record receipt dates, and create a case.",
+    "current_challenges": "Reports arrive through varied channels, information is incomplete, and intake timelines are tightly controlled."
+  },
+  {
+    "process_code": "P047",
+    "name": "Adverse event case triage",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Assess incoming safety reports for validity, seriousness, expectedness, priority, and processing pathway.",
+    "business_purpose": "Direct safety cases to the right workflow quickly and protect compliance with reporting obligations.",
+    "key_activities": "Check minimum criteria, classify seriousness, identify expedited timelines, route cases, and document rationale.",
+    "current_challenges": "Narratives are inconsistent, classification can require medical judgment, and high volumes create deadline pressure."
+  },
+  {
+    "process_code": "P048",
+    "name": "Duplicate safety case detection",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Compare incoming safety reports with existing cases to identify duplicate reports about the same patient or event.",
+    "business_purpose": "Maintain accurate case counts and avoid inconsistent or repeated safety reporting.",
+    "key_activities": "Compare identifiers and narratives, review potential matches, link or merge cases, and preserve an audit trail.",
+    "current_challenges": "Reports often omit identifiers, names are inconsistent, and distinguishing related events requires expert review."
+  },
+  {
+    "process_code": "P049",
+    "name": "Individual case safety report processing",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Perform medical and administrative processing of a valid safety case from data entry through coding, assessment, and quality review.",
+    "business_purpose": "Produce complete, consistent, and timely case records for signal evaluation and required reporting.",
+    "key_activities": "Enter narratives, code events and products, assess seriousness, request follow-up, and complete quality checks.",
+    "current_challenges": "Cases contain free text and missing details, coding conventions require expertise, and workloads fluctuate sharply."
+  },
+  {
+    "process_code": "P050",
+    "name": "Safety case medical review",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Apply clinical judgment to evaluate the medical meaning, seriousness, causality, and follow-up needs of safety cases.",
+    "business_purpose": "Ensure safety decisions reflect appropriate medical interpretation and protect patients and reporting quality.",
+    "key_activities": "Review narratives, assess temporal relationships, evaluate alternative causes, request information, and document conclusions.",
+    "current_challenges": "Clinical context may be incomplete, cases can be complex, and expert reviewer capacity is limited."
+  },
+  {
+    "process_code": "P051",
+    "name": "Safety signal detection",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Monitor safety data for new or changing patterns that may indicate a previously unrecognized product risk.",
+    "business_purpose": "Identify emerging risks early enough to support investigation and proportionate risk mitigation.",
+    "key_activities": "Review disproportionality and case trends, prioritize signals, investigate clinical context, and document decisions.",
+    "current_challenges": "Signals may be statistical artifacts, background rates change, and meaningful interpretation requires broad evidence."
+  },
+  {
+    "process_code": "P052",
+    "name": "Periodic safety report preparation",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Compile periodic assessments of cumulative safety information, benefit-risk considerations, and risk management actions.",
+    "business_purpose": "Meet reporting obligations and provide a structured assessment of whether product safety remains acceptable.",
+    "key_activities": "Define data cutoffs, summarize cases, review signals, prepare benefit-risk sections, and coordinate approvals.",
+    "current_challenges": "Data reconciliation is extensive, deadlines are fixed, and reports require input from many scientific and regional teams."
+  },
+  {
+    "process_code": "P053",
+    "name": "Risk management plan maintenance",
+    "domain": "Pharmacovigilance / Drug Safety",
+    "description": "Maintain the documented understanding of important product risks, missing information, monitoring activities, and mitigation measures.",
+    "business_purpose": "Translate evolving safety knowledge into proportionate actions that manage known and potential risks.",
+    "key_activities": "Review safety findings, update risk descriptions, track additional activities, and coordinate regulatory revisions.",
+    "current_challenges": "Risk evidence changes over time, regional plans differ, and effectiveness of mitigation activities can be difficult to measure."
+  },
+  {
+    "process_code": "P054",
+    "name": "Master batch record authoring",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Create and maintain approved instructions and records that define how a product batch is manufactured and documented.",
+    "business_purpose": "Standardize production execution and provide the controlled record needed to demonstrate batch compliance.",
+    "key_activities": "Define materials and steps, incorporate process parameters, route technical reviews, and control revisions.",
+    "current_challenges": "Instructions span many functions, changes require extensive review, and unclear steps can create execution variability."
+  },
+  {
+    "process_code": "P055",
+    "name": "Manufacturing production scheduling",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Sequence production orders, equipment usage, materials, and labor to meet demand while respecting capacity and quality constraints.",
+    "business_purpose": "Use manufacturing capacity effectively while delivering products on time and maintaining compliant operations.",
+    "key_activities": "Review demand, allocate lines, sequence batches, coordinate changeovers, and adjust schedules for disruptions.",
+    "current_challenges": "Materials, equipment, staffing, testing, and maintenance constraints interact and make schedules unstable."
+  },
+  {
+    "process_code": "P056",
+    "name": "Material dispensing and weighing",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Select, verify, weigh, and issue raw materials and components for a manufacturing batch under controlled conditions.",
+    "business_purpose": "Ensure the correct materials and quantities enter production with full traceability and contamination control.",
+    "key_activities": "Verify identity and status, weigh materials, record quantities, manage labels, and reconcile balances.",
+    "current_challenges": "Manual checks, complex recipes, environmental controls, and documentation requirements create error opportunities."
+  },
+  {
+    "process_code": "P057",
+    "name": "Manufacturing execution",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Execute approved processing steps and record parameters, observations, materials, and operator actions for a batch.",
+    "business_purpose": "Produce consistent, compliant batches according to validated processes and approved instructions.",
+    "key_activities": "Perform steps, monitor parameters, document observations, manage holds, and escalate abnormalities.",
+    "current_challenges": "Real-time decisions, paper or fragmented records, equipment interruptions, and operator variation affect execution."
+  },
+  {
+    "process_code": "P058",
+    "name": "In-process control monitoring",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Measure and review process or product attributes during manufacture to confirm the process remains within approved limits.",
+    "business_purpose": "Detect drift early and prevent nonconforming material from progressing through the manufacturing process.",
+    "key_activities": "Collect samples, perform tests, compare results with limits, document trends, and escalate excursions.",
+    "current_challenges": "Sampling timing, laboratory capacity, data transcription, and interpretation of borderline results can delay decisions."
+  },
+  {
+    "process_code": "P059",
+    "name": "Manufacturing deviation handling",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Document, investigate, assess impact, and resolve departures from approved manufacturing instructions or expected results.",
+    "business_purpose": "Protect product quality and identify corrective actions when manufacturing does not proceed as planned.",
+    "key_activities": "Contain material, describe the event, investigate causes, assess product impact, approve disposition, and track actions.",
+    "current_challenges": "Root causes can be multifactorial, evidence is distributed, and investigation timelines compete with production pressure."
+  },
+  {
+    "process_code": "P060",
+    "name": "Batch release review",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Review manufacturing, testing, deviation, and documentation records before authorizing a batch for distribution.",
+    "business_purpose": "Ensure only batches meeting approved quality and compliance requirements reach patients or customers.",
+    "key_activities": "Review batch records, laboratory results, deviations, yields, and approvals, then document release or rejection.",
+    "current_challenges": "Records arrive from many systems, unresolved exceptions require judgment, and release delays affect supply."
+  },
+  {
+    "process_code": "P061",
+    "name": "Cleaning validation execution",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Plan and execute sampling and testing that demonstrates manufacturing equipment can be cleaned to established acceptance criteria.",
+    "business_purpose": "Prevent cross-contamination and provide evidence that cleaning procedures remain effective.",
+    "key_activities": "Define worst cases, schedule campaigns, collect swab or rinse samples, review results, and document conclusions.",
+    "current_challenges": "Equipment access, residue variability, sampling locations, and analytical sensitivity make validation campaigns demanding."
+  },
+  {
+    "process_code": "P062",
+    "name": "Technology transfer to manufacturing",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Transfer product, process, analytical, and documentation knowledge from development or one site to a manufacturing location.",
+    "business_purpose": "Achieve reliable commercial or clinical production while preserving product quality and process intent.",
+    "key_activities": "Compare equipment and materials, transfer knowledge, run engineering batches, assess gaps, and approve readiness.",
+    "current_challenges": "Scale differences, undocumented tacit knowledge, site capability gaps, and concurrent timelines create risk."
+  },
+  {
+    "process_code": "P063",
+    "name": "Packaging and serialization execution",
+    "domain": "Pharmaceutical Manufacturing",
+    "description": "Package finished product and apply, verify, and reconcile serialization information required for traceability and distribution.",
+    "business_purpose": "Protect product identity and support compliant movement through the supply chain.",
+    "key_activities": "Prepare packaging components, configure equipment, verify codes, reconcile counts, and investigate exceptions.",
+    "current_challenges": "Line changes, code defects, equipment integration, and aggregation discrepancies can stop production or shipment."
+  },
+  {
+    "process_code": "P064",
+    "name": "Quality management system document control",
+    "domain": "Quality Management",
+    "description": "Create, review, approve, distribute, revise, and retire controlled procedures, forms, and quality records.",
+    "business_purpose": "Ensure personnel use current approved instructions and that the organization can demonstrate document governance.",
+    "key_activities": "Route drafts, manage approvals, assign effective dates, control access, train users, and archive superseded versions.",
+    "current_challenges": "Large document inventories, local variations, overdue reviews, and inconsistent metadata create governance gaps."
+  },
+  {
+    "process_code": "P065",
+    "name": "Corrective and preventive action management",
+    "domain": "Quality Management",
+    "description": "Investigate systemic quality issues and implement actions intended to correct causes and prevent recurrence.",
+    "business_purpose": "Improve the quality system and reduce repeated deviations, complaints, audit findings, and compliance risk.",
+    "key_activities": "Define the problem, perform root-cause analysis, plan actions, assign owners, verify effectiveness, and close records.",
+    "current_challenges": "Actions may address symptoms rather than causes, ownership is distributed, and effectiveness can take months to demonstrate."
+  },
+  {
+    "process_code": "P066",
+    "name": "Quality change control",
+    "domain": "Quality Management",
+    "description": "Assess, approve, implement, and close planned changes affecting products, processes, equipment, systems, or documents.",
+    "business_purpose": "Introduce necessary change without losing control of product quality, validation status, or regulatory commitments.",
+    "key_activities": "Describe the change, assess impact, define actions, obtain approvals, monitor implementation, and verify closure.",
+    "current_challenges": "Impacts cross functions and sites, dependencies are difficult to map, and implementation evidence may arrive late."
+  },
+  {
+    "process_code": "P067",
+    "name": "Quality event triage",
+    "domain": "Quality Management",
+    "description": "Review incoming deviations, complaints, audit findings, and other quality events to determine priority and workflow.",
+    "business_purpose": "Direct quality issues to appropriate investigation and escalation pathways based on potential product and compliance impact.",
+    "key_activities": "Classify events, assess initial risk, define containment, assign owners, and set investigation timelines.",
+    "current_challenges": "Initial information is incomplete, classification requires judgment, and high event volumes strain quality teams."
+  },
+  {
+    "process_code": "P068",
+    "name": "Quality audit planning",
+    "domain": "Quality Management",
+    "description": "Develop and maintain risk-based schedules for internal, supplier, and other quality audits.",
+    "business_purpose": "Use audit resources where they can best identify compliance and quality-system weaknesses.",
+    "key_activities": "Review risk profiles, set scope and frequency, assign auditors, coordinate logistics, and track completion.",
+    "current_challenges": "Risk information is fragmented, auditor capacity is limited, and business changes can invalidate annual plans."
+  },
+  {
+    "process_code": "P069",
+    "name": "Supplier qualification",
+    "domain": "Quality Management",
+    "description": "Evaluate and approve suppliers of materials, services, equipment, or components against quality and business requirements.",
+    "business_purpose": "Reduce supply and product risk by using suppliers with demonstrated capability and suitable controls.",
+    "key_activities": "Assess questionnaires, review certifications, conduct audits, define quality agreements, and approve supplier status.",
+    "current_challenges": "Supplier information changes, global requirements differ, and risk-based oversight must balance cost and coverage."
+  },
+  {
+    "process_code": "P070",
+    "name": "Product complaint quality assessment",
+    "domain": "Quality Management",
+    "description": "Evaluate product complaints for potential quality defects, patient impact, investigation needs, and reporting obligations.",
+    "business_purpose": "Protect patients and identify product or process issues through timely and consistent complaint handling.",
+    "key_activities": "Classify complaints, assess risk, request samples, coordinate investigations, identify trends, and document conclusions.",
+    "current_challenges": "Complaint narratives vary, samples may be unavailable, and quality and safety responsibilities can overlap."
+  },
+  {
+    "process_code": "P071",
+    "name": "Stability program management",
+    "domain": "Quality Management",
+    "description": "Plan, schedule, monitor, and interpret stability studies that establish or confirm product shelf life and storage conditions.",
+    "business_purpose": "Maintain evidence that products remain within quality specifications throughout their approved period of use.",
+    "key_activities": "Define protocols, place samples, schedule pulls, review results, investigate trends, and update commitments.",
+    "current_challenges": "Long study durations, storage capacity, missed pulls, and subtle trends require disciplined oversight."
+  },
+  {
+    "process_code": "P072",
+    "name": "Annual product quality review",
+    "domain": "Quality Management",
+    "description": "Periodically evaluate manufacturing, testing, deviations, complaints, stability, and change data for a product.",
+    "business_purpose": "Detect adverse trends and confirm that the process and control strategy remain appropriate.",
+    "key_activities": "Collect data, analyze trends, assess process capability, document conclusions, and assign improvement actions.",
+    "current_challenges": "Data is distributed across systems, trends can be difficult to interpret, and reviews require extensive reconciliation."
+  },
+  {
+    "process_code": "P073",
+    "name": "Pharmaceutical demand forecasting",
+    "domain": "Supply Chain & Logistics",
+    "description": "Estimate future product demand by market, channel, presentation, and time period using commercial and operational inputs.",
+    "business_purpose": "Align supply, manufacturing, inventory, and financial planning with expected patient and customer need.",
+    "key_activities": "Review history, incorporate launches and events, gather market inputs, create scenarios, and approve forecasts.",
+    "current_challenges": "Forecasts are affected by launches, tenders, access changes, seasonality, and limited visibility into actual demand."
+  },
+  {
+    "process_code": "P074",
+    "name": "Supply planning",
+    "domain": "Supply Chain & Logistics",
+    "description": "Translate demand forecasts into production, procurement, inventory, and distribution plans across the supply network.",
+    "business_purpose": "Balance service levels, capacity, working capital, and product availability across markets.",
+    "key_activities": "Review constraints, model supply scenarios, allocate inventory, set production plans, and escalate shortages.",
+    "current_challenges": "Long lead times, batch constraints, quality holds, and changing demand make plans require frequent replanning."
+  },
+  {
+    "process_code": "P075",
+    "name": "Inventory optimization",
+    "domain": "Supply Chain & Logistics",
+    "description": "Set inventory targets and replenishment policies for materials, intermediates, finished products, and market stock.",
+    "business_purpose": "Maintain resilient supply while limiting expiry, obsolescence, storage cost, and excess working capital.",
+    "key_activities": "Segment items, review variability, set safety stocks, monitor aging, and adjust targets by market risk.",
+    "current_challenges": "Shelf life, cold-chain constraints, forecast error, and service requirements create conflicting inventory objectives."
+  },
+  {
+    "process_code": "P076",
+    "name": "Pharmaceutical procurement",
+    "domain": "Supply Chain & Logistics",
+    "description": "Source and purchase materials, components, services, and capacity needed to support pharmaceutical operations.",
+    "business_purpose": "Secure reliable supply at suitable cost, quality, terms, and lead time.",
+    "key_activities": "Translate requirements into orders, evaluate suppliers, negotiate terms, release purchases, and monitor confirmations.",
+    "current_challenges": "Shortages, qualification requirements, price volatility, and long lead times can disrupt procurement decisions."
+  },
+  {
+    "process_code": "P077",
+    "name": "Supplier order management",
+    "domain": "Supply Chain & Logistics",
+    "description": "Monitor purchase orders, confirmations, changes, delivery dates, and exceptions for external suppliers.",
+    "business_purpose": "Improve material availability and provide early warning when supplier execution threatens the plan.",
+    "key_activities": "Confirm orders, track milestones, manage changes, escalate delays, and reconcile receipts with commitments.",
+    "current_challenges": "Supplier communication is inconsistent, dates change frequently, and order data may not align across systems."
+  },
+  {
+    "process_code": "P078",
+    "name": "Cold-chain monitoring",
+    "domain": "Supply Chain & Logistics",
+    "description": "Monitor temperature-controlled shipments and storage conditions for products and materials that require defined ranges.",
+    "business_purpose": "Protect product quality and determine appropriate disposition when temperature conditions are challenged.",
+    "key_activities": "Review sensor records, investigate excursions, assess exposure, coordinate disposition, and document actions.",
+    "current_challenges": "Data arrives after transit, sensor coverage varies, and disposition decisions require technical and quality judgment."
+  },
+  {
+    "process_code": "P079",
+    "name": "Pharmaceutical warehouse operations",
+    "domain": "Supply Chain & Logistics",
+    "description": "Receive, store, pick, inspect, and dispatch pharmaceutical materials and products under controlled warehouse procedures.",
+    "business_purpose": "Maintain inventory accuracy, product integrity, traceability, and timely fulfillment.",
+    "key_activities": "Verify receipts, manage locations, control status, perform cycle counts, pick orders, and handle returns.",
+    "current_challenges": "Temperature zones, status controls, expiry management, manual transactions, and peak demand increase operational risk."
+  },
+  {
+    "process_code": "P080",
+    "name": "Distribution planning",
+    "domain": "Supply Chain & Logistics",
+    "description": "Plan shipments from manufacturing and distribution locations to markets while meeting delivery, temperature, and regulatory constraints.",
+    "business_purpose": "Deliver the right product to the right market reliably and efficiently.",
+    "key_activities": "Consolidate orders, select routes, book carriers, prepare export documents, and monitor delivery exceptions.",
+    "current_challenges": "Country rules, carrier capacity, temperature requirements, and last-minute order changes complicate execution."
+  },
+  {
+    "process_code": "P081",
+    "name": "Market demand and opportunity forecasting",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Estimate market size, treatment adoption, competitor movement, and product opportunity across therapeutic areas and geographies.",
+    "business_purpose": "Support portfolio, investment, launch, and resource decisions with a structured view of commercial opportunity.",
+    "key_activities": "Review epidemiology and market data, model scenarios, assess competitors, and document assumptions.",
+    "current_challenges": "External data can be delayed or inconsistent, assumptions are uncertain, and stakeholder views may diverge."
+  },
+  {
+    "process_code": "P082",
+    "name": "Product launch readiness",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Coordinate commercial, medical, regulatory, supply, access, and operational activities required for a product launch.",
+    "business_purpose": "Reduce launch delays and ensure functions are ready to support appropriate product availability and uptake.",
+    "key_activities": "Track readiness milestones, resolve dependencies, prepare materials, coordinate training, and manage launch risks.",
+    "current_challenges": "Launch activities are interdependent, market approvals vary, and late changes can affect many teams at once."
+  },
+  {
+    "process_code": "P083",
+    "name": "Pricing and reimbursement intelligence",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Collect and analyze information about pricing, payer decisions, reimbursement pathways, and access barriers.",
+    "business_purpose": "Inform market access strategy and help teams understand how payment conditions may affect patient availability.",
+    "key_activities": "Monitor payer policies, compare markets, track negotiations, assess evidence requirements, and summarize implications.",
+    "current_challenges": "Policies differ by market, information may be confidential or incomplete, and decisions can change rapidly."
+  },
+  {
+    "process_code": "P084",
+    "name": "Sales force planning",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Plan field force size, roles, deployment, targeting, and capability requirements for product and market objectives.",
+    "business_purpose": "Match commercial resources to customer opportunity while managing cost and compliant engagement.",
+    "key_activities": "Assess territory opportunity, define roles, model capacity, plan hiring, and align training requirements.",
+    "current_challenges": "Customer access changes, territories differ, data is imperfect, and planning choices have long-term cost effects."
+  },
+  {
+    "process_code": "P085",
+    "name": "Sales territory alignment",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Assign customer accounts and healthcare professional segments to territories and field roles using agreed business rules.",
+    "business_purpose": "Create balanced coverage and clear accountability for customer engagement.",
+    "key_activities": "Review account data, apply alignment rules, resolve exceptions, communicate assignments, and manage changes.",
+    "current_challenges": "Customer data changes often, account ownership is contested, and balancing workload requires judgment."
+  },
+  {
+    "process_code": "P086",
+    "name": "Promotional material review",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Review promotional claims, references, presentation, and required fair-balance content before materials are used externally.",
+    "business_purpose": "Support effective communication while ensuring materials are accurate, approved, and compliant with applicable requirements.",
+    "key_activities": "Submit drafts, check claims and references, coordinate medical and regulatory review, resolve comments, and approve release.",
+    "current_challenges": "Reviews involve many functions, evidence changes, revision cycles are long, and claims require careful context."
+  },
+  {
+    "process_code": "P087",
+    "name": "Sales performance reporting",
+    "domain": "Commercial / Sales / Marketing",
+    "description": "Compile and interpret sales activity, customer coverage, product performance, and territory results for commercial management.",
+    "business_purpose": "Give leaders a consistent basis for resource allocation, coaching, and adjustment of commercial plans.",
+    "key_activities": "Collect data, reconcile metrics, produce reports, investigate variances, and communicate performance insights.",
+    "current_challenges": "Data definitions differ, reporting lags occur, and performance metrics can be affected by access and supply factors."
+  },
+  {
+    "process_code": "P088",
+    "name": "Medical information inquiry handling",
+    "domain": "Medical Affairs",
+    "description": "Receive, research, author, review, and respond to unsolicited medical questions about approved or investigational products.",
+    "business_purpose": "Provide accurate, balanced, and timely scientific information to healthcare professionals and patients.",
+    "key_activities": "Classify inquiries, search approved content, draft responses, route for medical review, and document interactions.",
+    "current_challenges": "Questions vary widely, response timelines can be short, and content must remain accurate as evidence changes."
+  },
+  {
+    "process_code": "P089",
+    "name": "Medical science liaison engagement planning",
+    "domain": "Medical Affairs",
+    "description": "Plan compliant scientific engagements between medical science liaisons and external healthcare experts based on medical priorities.",
+    "business_purpose": "Support two-way scientific exchange and gather insights that inform medical strategy without promoting products inappropriately.",
+    "key_activities": "Define priorities, identify stakeholders, plan engagements, document insights, and manage follow-up actions.",
+    "current_challenges": "Stakeholder needs are diverse, engagement records are qualitative, and compliance boundaries require careful judgment."
+  },
+  {
+    "process_code": "P090",
+    "name": "Scientific response authoring",
+    "domain": "Medical Affairs",
+    "description": "Prepare evidence-based scientific responses and educational content for recurring medical questions and field needs.",
+    "business_purpose": "Create consistent, reviewable scientific information that can be used appropriately across medical channels.",
+    "key_activities": "Define the question, review evidence, draft balanced language, obtain medical review, and control approved versions.",
+    "current_challenges": "Evidence may be mixed, source content changes, and responses must distinguish established findings from uncertainty."
+  },
+  {
+    "process_code": "P091",
+    "name": "Investigator-initiated study review",
+    "domain": "Medical Affairs",
+    "description": "Evaluate external investigator proposals for scientific merit, feasibility, strategic relevance, and appropriate support.",
+    "business_purpose": "Allocate support to valuable independent research while maintaining governance, transparency, and compliance.",
+    "key_activities": "Screen proposals, assess scientific design, review budgets, obtain committee decisions, and monitor approved studies.",
+    "current_challenges": "Proposals differ substantially, scientific merit is nuanced, and governance requires coordination across functions."
+  },
+  {
+    "process_code": "P092",
+    "name": "Medical congress planning",
+    "domain": "Medical Affairs",
+    "description": "Plan scientific presence, content, logistics, and stakeholder engagement for medical congresses and scientific meetings.",
+    "business_purpose": "Share approved scientific information and enable appropriate exchange with the medical community.",
+    "key_activities": "Set objectives, coordinate abstracts and materials, plan staffing, manage approvals, and capture congress insights.",
+    "current_challenges": "Deadlines are fixed, multiple content owners are involved, and last-minute program changes create pressure."
+  },
+  {
+    "process_code": "P093",
+    "name": "Key opinion leader mapping",
+    "domain": "Medical Affairs",
+    "description": "Identify and characterize scientific experts relevant to disease areas, evidence needs, and medical engagement planning.",
+    "business_purpose": "Support thoughtful scientific engagement based on expertise and legitimate medical priorities.",
+    "key_activities": "Review publications and expertise, validate profiles, segment stakeholders, and document compliant engagement rationale.",
+    "current_challenges": "Expertise is multidimensional, public information is incomplete, and assessments require contextual human judgment."
+  },
+  {
+    "process_code": "P094",
+    "name": "Medical education program planning",
+    "domain": "Medical Affairs",
+    "description": "Design and govern non-promotional educational programs that address appropriate disease or scientific knowledge needs.",
+    "business_purpose": "Support responsible scientific education and improve understanding of disease, diagnosis, or treatment evidence.",
+    "key_activities": "Assess needs, define learning objectives, select faculty, review content, and evaluate program outcomes.",
+    "current_challenges": "Needs assessment is qualitative, content requires balanced review, and educational impact can be hard to measure."
+  },
+  {
+    "process_code": "P095",
+    "name": "Enterprise training administration",
+    "domain": "Enterprise Support",
+    "description": "Plan, assign, track, and report employee training required for roles, systems, quality procedures, and professional development.",
+    "business_purpose": "Ensure people have the knowledge and documented qualifications needed to perform their responsibilities.",
+    "key_activities": "Maintain curricula, assign courses, monitor completion, manage overdue training, and report compliance status.",
+    "current_challenges": "Roles change, training catalogs are large, completion data spans systems, and overdue items require repeated follow-up."
+  },
+  {
+    "process_code": "P096",
+    "name": "Finance planning and forecasting",
+    "domain": "Enterprise Support",
+    "description": "Coordinate budgets, forecasts, scenario planning, and variance explanations across research, development, operations, and commercial functions.",
+    "business_purpose": "Provide financial visibility for resource allocation and strategic decisions across the pharmaceutical portfolio.",
+    "key_activities": "Collect assumptions, build plans, review spend, model scenarios, reconcile actuals, and explain variances.",
+    "current_challenges": "Inputs arrive at different levels of detail, program assumptions change, and cross-functional ownership can be unclear."
+  },
+  {
+    "process_code": "P097",
+    "name": "Human resources case management",
+    "domain": "Enterprise Support",
+    "description": "Receive, classify, route, resolve, and document employee questions and requests handled by human resources teams.",
+    "business_purpose": "Provide consistent employee support while protecting privacy, policy compliance, and service responsiveness.",
+    "key_activities": "Capture requests, verify context, research policy, coordinate specialists, document resolution, and close cases.",
+    "current_challenges": "Requests are sensitive and varied, policies differ by location, and case context may be incomplete."
+  },
+  {
+    "process_code": "P098",
+    "name": "Enterprise procurement request intake",
+    "domain": "Enterprise Support",
+    "description": "Receive and triage internal requests for goods or services that require procurement review, sourcing, or contracting support.",
+    "business_purpose": "Route purchasing needs through appropriate controls while helping employees obtain required services efficiently.",
+    "key_activities": "Capture requirements, classify spend, check approvals, route sourcing work, and track request status.",
+    "current_challenges": "Requests vary in completeness, approval paths differ by spend type, and urgency can bypass normal planning."
+  },
+  {
+    "process_code": "P099",
+    "name": "IT service desk request management",
+    "domain": "Enterprise Support",
+    "description": "Log, classify, prioritize, resolve, and track employee incidents and service requests for enterprise technology.",
+    "business_purpose": "Restore or provide technology services reliably while maintaining visibility into recurring operational issues.",
+    "key_activities": "Capture tickets, troubleshoot, route escalations, communicate status, document fixes, and close requests.",
+    "current_challenges": "Descriptions are inconsistent, issues span many systems, and prioritization must balance business impact and urgency."
+  },
+  {
+    "process_code": "P100",
+    "name": "Vendor access management",
+    "domain": "Enterprise Support",
+    "description": "Request, approve, provision, review, and revoke system access for external vendors supporting enterprise operations.",
+    "business_purpose": "Enable necessary external collaboration while limiting access risk and maintaining accountability.",
+    "key_activities": "Validate business need, approve roles, provision accounts, review access, and remove access at contract end.",
+    "current_challenges": "Vendor populations change, ownership can be unclear, and timely access removal depends on multiple teams."
+  }
+]

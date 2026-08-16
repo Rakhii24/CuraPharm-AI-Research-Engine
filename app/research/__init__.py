@@ -1,0 +1,2 @@
+"""External research acquisition layer."""
+

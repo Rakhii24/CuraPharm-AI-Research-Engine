@@ -1,0 +1,2 @@
+"""CuraPharm application package."""
+
