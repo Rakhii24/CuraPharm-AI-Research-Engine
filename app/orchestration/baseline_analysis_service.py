@@ -26,6 +26,8 @@ from typing import Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.ai.factory import create_llm_provider
+from app.ai.providers import LLMProvider
 from app.config.settings import Settings, get_settings
 from app.database.models import (
     Analysis,
@@ -104,12 +106,20 @@ class BaselineAnalysisService:
         research_service: Optional[ResearchService] = None,
         analysis_service: Optional[AnalysisService] = None,
         scoring_service: Optional[ScoringService] = None,
+        llm_provider: Optional[LLMProvider] = None,
     ):
         self.session_factory = session_factory
         self.settings = settings or get_settings()
         self.research_service = research_service or ResearchService(
             session_factory=session_factory, settings=self.settings,
         )
+        if analysis_service is None:
+            provider = llm_provider or create_llm_provider(settings=self.settings)
+            analysis_service = AnalysisService(
+                llm_provider=provider,
+                session_factory=session_factory,
+                settings=self.settings,
+            )
         self.analysis_service = analysis_service
         self.scoring_service = scoring_service or ScoringService(
             session_factory=session_factory,
