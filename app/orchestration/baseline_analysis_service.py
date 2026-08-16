@@ -241,6 +241,22 @@ class BaselineAnalysisService:
                 )
 
             # Stage 2: AI analysis
+            import os
+            analysis_svc_type = type(self.analysis_service).__name__ if self.analysis_service is not None else "None"
+            analysis_svc_module = getattr(type(self.analysis_service), "__module__", "None") if self.analysis_service is not None else "None"
+            commit_id = os.getenv("RENDER_GIT_COMMIT", "local")
+            logger.info(
+                "[DIAGNOSTIC] Process: %s | Commit: %s | self: %s (%s) | analysis_service: %s (Type: %s, Module: %s, Is None: %s) | Source: %s",
+                code,
+                commit_id,
+                self,
+                type(self).__name__,
+                self.analysis_service,
+                analysis_svc_type,
+                analysis_svc_module,
+                self.analysis_service is None,
+                __file__,
+            )
             analysis_outcome = self.analysis_service.analyze_process(process.id)
 
             if analysis_outcome.status != "completed" or analysis_outcome.version_id is None:
