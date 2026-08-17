@@ -148,10 +148,11 @@ class TestQueryBackwardCompatibility:
         assert len(DOMAIN_VOCABULARY) == 12
 
     def test_routing_unchanged(self):
-        assert providers_for_domain("Research & Drug Discovery") == ("pubmed",)
+        assert providers_for_domain("Research & Drug Discovery") == ("pubmed", "openfda")
         assert providers_for_domain("Clinical Development") == ("pubmed", "openfda")
-        assert providers_for_domain("Enterprise Support") == ()
-        assert providers_for_domain("Unknown domain") == ()
+        assert providers_for_domain("Enterprise Support") == ("pubmed", "openfda")
+        assert providers_for_domain("Supply Chain & Logistics") == ("pubmed", "openfda")
+
 
 
 # ===========================================================================

@@ -61,7 +61,9 @@ class ResearchService:
     ):
         self.session_factory = session_factory
         self.settings = settings or get_settings()
-        self.providers = dict(providers or self._default_providers())
+        self.providers = dict(
+            providers if providers is not None else self._default_providers()
+        )
 
     def _default_providers(self):
         return {
@@ -86,12 +88,13 @@ class ResearchService:
             }
             outcome = ResearchOutcome(process.id, build_research_query(process_data))
             provider_names = providers_for_domain(process.domain)
-            if not provider_names:
+            active_providers = [p for p in provider_names if p in self.providers]
+            if not active_providers:
                 self._record_unavailable_run(session, process, outcome)
                 session.commit()
                 return outcome
 
-            for provider_name in provider_names:
+            for provider_name in active_providers:
                 self._run_provider(session, process, process_data, provider_name, outcome)
             session.commit()
             self._set_overall_status(outcome)
@@ -102,7 +105,7 @@ class ResearchService:
     ):
         provider = self.providers.get(provider_name)
         if provider is None:
-            outcome.provider_status[provider_name] = "failed"
+            outcome.provider_status[provider_name] = "unavailable"
             outcome.errors[provider_name] = "No implementation configured for provider"
             return
 
@@ -281,12 +284,14 @@ class ResearchService:
     @staticmethod
     def _set_overall_status(outcome):
         statuses = list(outcome.provider_status.values())
-        if not statuses or all(status == "unavailable" for status in statuses):
+        non_unavailable = [s for s in statuses if s != "unavailable"]
+        if not non_unavailable:
             outcome.status = "unavailable"
-        elif all(status == "completed" for status in statuses):
+        elif all(status == "completed" for status in non_unavailable):
             outcome.status = "completed"
-        elif any(status == "completed" for status in statuses):
+        elif any(status == "completed" for status in non_unavailable):
             outcome.status = "partial"
         else:
             outcome.status = "failed"
+
 

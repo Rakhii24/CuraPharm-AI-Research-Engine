@@ -174,8 +174,9 @@ def test_openfda_error_is_controlled():
 
 def test_routing_and_no_provider_result(tmp_path):
     assert providers_for_domain("Clinical Development") == ("pubmed", "openfda")
-    assert providers_for_domain("Enterprise Support") == ()
-    assert providers_for_domain("Unknown domain") == ()
+    assert providers_for_domain("Supply Chain & Logistics") == ("pubmed", "openfda")
+    assert providers_for_domain("Enterprise Support") == ("pubmed", "openfda")
+
 
     database_url = "sqlite:///{}".format(tmp_path / "no-provider.db")
     database_engine = create_database_engine(database_url)

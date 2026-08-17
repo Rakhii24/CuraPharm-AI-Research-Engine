@@ -273,7 +273,24 @@ class TestProviderlessDomains:
             ))
             session.commit()
 
-        rs, ans, ss, _, lp = _make_services(factory)
+        settings = Settings(
+            _env_file=None,
+            gemini_model="gemini-3.5-flash",
+            gemini_api_key="test-only",
+            research_cache_minutes=0,
+        )
+        rs = ResearchService(
+            session_factory=factory,
+            settings=settings,
+            providers={},
+        )
+        lp = MockLLMProvider()
+        ans = AnalysisService(
+            llm_provider=lp,
+            session_factory=factory,
+            settings=settings,
+        )
+        ss = ScoringService(session_factory=factory)
         service = BaselineAnalysisService(
             session_factory=factory, research_service=rs,
             analysis_service=ans, scoring_service=ss,
@@ -284,6 +301,7 @@ class TestProviderlessDomains:
         # Gemini must NOT be called without evidence
         assert lp.calls == 0
         engine.dispose()
+
 
 
 class TestFailureIsolation:

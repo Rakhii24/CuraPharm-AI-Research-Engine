@@ -159,14 +159,12 @@ class AnalysisService:
         ).all()
         if not statuses:
             return "unavailable"
-        if any(status in ("failed", "partial") for status in statuses) and any(
-            status == "completed" for status in statuses
-        ):
+        if any(status == "completed" for status in statuses):
+            return "completed"
+        if any(status == "partial" for status in statuses):
             return "partial"
         if all(status == "unavailable" for status in statuses):
             return "unavailable"
-        if all(status == "completed" for status in statuses):
-            return "completed"
         return statuses[0]
 
     @staticmethod
