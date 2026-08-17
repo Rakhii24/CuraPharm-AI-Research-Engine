@@ -180,8 +180,7 @@ def build_result_terms(
     if title:
         parts.append(title)
     if excerpt:
-        # Use first 500 chars of excerpt to avoid huge abstracts dominating
-        parts.append(excerpt[:500])
+        parts.append(excerpt)
     return _extract_terms(" ".join(parts))
 
 

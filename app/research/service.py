@@ -180,7 +180,7 @@ class ResearchService:
 
     def _find_recent_success(self, session, process_id, provider_name, query):
         cutoff = utc_now() - timedelta(minutes=self.settings.research_cache_minutes)
-        return session.scalar(
+        run = session.scalar(
             select(ResearchRun)
             .where(
                 ResearchRun.process_id == process_id,
@@ -191,6 +191,11 @@ class ResearchService:
             )
             .order_by(ResearchRun.created_at.desc())
         )
+        if run is not None:
+            metadata = run.request_metadata or {}
+            if len(metadata.get("evidence_ids", [])) > 0:
+                return run
+        return None
 
     @staticmethod
     def _use_cached_run(run, outcome, provider_name):
