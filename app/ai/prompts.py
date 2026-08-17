@@ -19,6 +19,7 @@ invent facts, citations, URLs, PMIDs, FDA identifiers, or unsupported claims.
 If evidence is unavailable or insufficient, state that clearly in confidence and
 limitations. When evidence items are present in the EVIDENCE PACKAGE, you must include
 at least one supported claim citing a valid supplied evidence_id in evidence_references.
+CRITICAL: The numeric value in each evidence_id field in evidence_references MUST exactly match the numeric 'evidence_id' from the EVIDENCE PACKAGE below.
 If the EVIDENCE PACKAGE is empty ([]), set evidence_references to an empty list [].
 Do not cite an ID that is not in the evidence package.
 Always provide at least 1 relevant technology/AI capability, 1 business benefit, and 1 risk based on the operational process context.

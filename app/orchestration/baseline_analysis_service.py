@@ -342,7 +342,6 @@ class BaselineAnalysisService:
             target_id = batch_job.id
             done_codes = set(metadata.get("completed", []))
             done_codes.update(metadata.get("skipped", []))
-            done_codes.update(metadata.get("insufficient_evidence", []))
             return target_id, done_codes
 
     def _get_or_create_batch_job(self, processes) -> tuple:
@@ -364,7 +363,6 @@ class BaselineAnalysisService:
                 target_id = existing.id
                 done_codes = set(metadata.get("completed", []))
                 done_codes.update(metadata.get("skipped", []))
-                done_codes.update(metadata.get("insufficient_evidence", []))
                 return target_id, done_codes
 
             batch_job = BatchJob(

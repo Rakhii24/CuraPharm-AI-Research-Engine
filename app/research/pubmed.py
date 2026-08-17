@@ -64,6 +64,20 @@ class PubMedProvider(ResearchProvider):
             )
             search_payload = search_response.json()
             ids = search_payload.get("esearchresult", {}).get("idlist", [])
+
+            if (not isinstance(ids, list) or not ids) and context:
+                import re
+                name = str(context.get("name", "")).strip()
+                if name:
+                    clean_name = " ".join(re.findall(r"[a-zA-Z0-9]+", name))
+                    fallback_term = '"{}" OR ({} AND pharmaceutical)'.format(clean_name, clean_name)
+                    fallback_response = self.http.get(
+                        EUTILS_BASE_URL + "/esearch.fcgi",
+                        self._params({"term": fallback_term, "retmax": self.settings.pubmed_max_results}),
+                    )
+                    fallback_payload = fallback_response.json()
+                    ids = fallback_payload.get("esearchresult", {}).get("idlist", [])
+
             if not isinstance(ids, list) or not ids:
                 return []
 

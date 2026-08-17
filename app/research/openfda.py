@@ -12,11 +12,18 @@ from app.research.schemas import NormalizedResearchResult
 
 OPENFDA_BASE_URL = "https://api.fda.gov"
 ENDPOINT_BY_DOMAIN = {
+    "Research & Drug Discovery": "drug/label.json",
+    "Preclinical Development": "drug/label.json",
     "Clinical Development": "drug/label.json",
+    "Clinical Operations": "drug/label.json",
     "Regulatory Affairs": "drug/label.json",
     "Pharmacovigilance / Drug Safety": "drug/event.json",
     "Pharmaceutical Manufacturing": "drug/ndc.json",
     "Quality Management": "drug/label.json",
+    "Supply Chain & Logistics": "drug/ndc.json",
+    "Commercial / Sales / Marketing": "drug/label.json",
+    "Medical Affairs": "drug/label.json",
+    "Enterprise Support": "drug/label.json",
 }
 
 
