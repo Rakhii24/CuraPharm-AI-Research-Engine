@@ -63,18 +63,26 @@ class CuraPharmApi:
         else:
             url = self.base_url + path
 
-        try:
-            response = self.client.request(method, url, **kwargs)
-        except httpx.ReadTimeout as exc:
-            raise ApiError("The backend request timed out while waiting for a response.") from exc
-        except httpx.ConnectTimeout as exc:
-            raise ApiError("Connection to the CuraPharm backend timed out.") from exc
-        except httpx.ConnectError as exc:
-            raise ApiError("Unable to connect to CuraPharm backend. Ensure the backend service is running.") from exc
-        except httpx.HTTPStatusError as exc:
-            raise ApiError("The backend returned an HTTP error (HTTP {}).".format(exc.response.status_code), exc.response.status_code) from exc
-        except httpx.HTTPError as exc:
-            raise ApiError("The CuraPharm backend communication error: {}".format(exc)) from exc
+        import time
+        max_connect_retries = 3
+        for attempt in range(max_connect_retries):
+            try:
+                response = self.client.request(method, url, **kwargs)
+                break
+            except httpx.ConnectError as exc:
+                if attempt < max_connect_retries - 1 and method in ("GET", "HEAD"):
+                    time.sleep(1.0)
+                    continue
+                raise ApiError("Unable to connect to CuraPharm backend. Ensure the backend service is running.") from exc
+            except httpx.ReadTimeout as exc:
+                raise ApiError("The backend request timed out while waiting for a response.") from exc
+            except httpx.ConnectTimeout as exc:
+                raise ApiError("Connection to the CuraPharm backend timed out.") from exc
+            except httpx.HTTPStatusError as exc:
+                raise ApiError("The backend returned an HTTP error (HTTP {}).".format(exc.response.status_code), exc.response.status_code) from exc
+            except httpx.HTTPError as exc:
+                raise ApiError("The CuraPharm backend communication error: {}".format(exc)) from exc
+
 
         if response.is_success:
             return response.json()

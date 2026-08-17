@@ -245,6 +245,60 @@ def test_stale_running_job_resumes_with_new_worker(async_test_db):
         client.close()
 
 
+def test_polling_active_endpoint_auto_heals_stale_worker(async_test_db):
+    """When a job is left 'running' by a dead container, polling GET /batch/active auto-resumes worker."""
+    engine, session_factory = async_test_db
+
+    with session_factory() as session:
+        stale_job = BatchJob(
+            job_type="baseline_analysis",
+            status="running",
+            total_count=100,
+            completed_count=89,
+            failed_count=0,
+            job_metadata={
+                "current_process": "P098",
+                "completed": ["P{:03d}".format(i) for i in range(1, 42)],
+                "skipped": [],
+                "failed": {},
+                "insufficient_evidence": ["P{:03d}".format(i) for i in range(42, 90)],
+                "last_heartbeat": "2020-01-01T00:00:00",
+            },
+        )
+        session.add(stale_job)
+        session.commit()
+        session.refresh(stale_job)
+        stale_id = stale_job.id
+
+    mock_service = MagicMock(spec=BaselineAnalysisService)
+    mock_service.session_factory = session_factory
+    mock_service.JOB_TYPE = "baseline_analysis"
+
+    from app.api.routes import get_baseline_analysis_service
+    import app.api.routes as routes_module
+    app.dependency_overrides[get_baseline_analysis_service] = lambda: mock_service
+    routes_module._ACTIVE_WORKER_JOB_ID = None
+    routes_module._ACTIVE_WORKER_THREAD = None
+
+    client = TestClient(app)
+    try:
+        resp = client.get("/api/processes/batch/active")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["job_id"] == stale_id
+        assert data["status"] == "running"
+        assert data["processed"] == 89
+
+        # Verify worker thread was automatically spawned on poll
+        assert routes_module._ACTIVE_WORKER_JOB_ID == stale_id
+        assert routes_module._ACTIVE_WORKER_THREAD is not None
+    finally:
+        routes_module._ACTIVE_WORKER_JOB_ID = None
+        routes_module._ACTIVE_WORKER_THREAD = None
+        app.dependency_overrides.clear()
+        client.close()
+
+
 def test_completed_job_is_never_restarted(async_test_db):
     """When a previous job is completed, analyze-all starts a new job rather than reusing."""
     engine, session_factory = async_test_db

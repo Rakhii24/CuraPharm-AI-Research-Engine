@@ -112,7 +112,7 @@ def analyze_process(
         )
 
 
-_ACTIVE_WORKER_LOCK = threading.Lock()
+_ACTIVE_WORKER_LOCK = threading.RLock()
 _ACTIVE_WORKER_THREAD: Optional[threading.Thread] = None
 _ACTIVE_WORKER_JOB_ID: Optional[int] = None
 HEARTBEAT_TIMEOUT_SECONDS = 180  # 3 minutes
@@ -142,6 +142,32 @@ def is_worker_active(job: BatchJob) -> bool:
     return False
 
 
+def _ensure_worker_running(
+    job_id: int,
+    session_factory=None,
+    baseline_service: Optional[BaselineAnalysisService] = None,
+) -> None:
+    """Safely spawn a worker thread for an active/queued job if no worker thread is currently running."""
+    global _ACTIVE_WORKER_THREAD, _ACTIVE_WORKER_JOB_ID
+    with _ACTIVE_WORKER_LOCK:
+        if _ACTIVE_WORKER_JOB_ID == job_id and _ACTIVE_WORKER_THREAD is not None and _ACTIVE_WORKER_THREAD.is_alive():
+            return
+
+        resolved_factory = session_factory or SessionLocal
+
+        def _run_worker(target_job_id: int):
+            try:
+                svc = baseline_service if baseline_service is not None else BaselineAnalysisService(session_factory=resolved_factory)
+                svc.run_baseline(batch_job_id=target_job_id)
+            except Exception as exc:
+                logger.error("Background batch worker failed for job %s: %s", target_job_id, exc)
+
+        _ACTIVE_WORKER_JOB_ID = job_id
+        _ACTIVE_WORKER_THREAD = threading.Thread(target=_run_worker, args=(job_id,), daemon=True)
+        _ACTIVE_WORKER_THREAD.start()
+        logger.info("Auto-spawned background batch worker for job %s", job_id)
+
+
 @router.post(
     "/api/processes/analyze-all",
     response_model=BatchWorkflowResponse,
@@ -151,7 +177,6 @@ def analyze_all_processes(
     baseline_service: BaselineAnalysisService = Depends(get_baseline_analysis_service),
 ):
     """Trigger background batch pipeline across baseline processes and return immediately."""
-    global _ACTIVE_WORKER_THREAD, _ACTIVE_WORKER_JOB_ID
     session_factory = getattr(baseline_service, "session_factory", SessionLocal)
 
     with _ACTIVE_WORKER_LOCK:
@@ -166,50 +191,25 @@ def analyze_all_processes(
                 .order_by(BatchJob.id.desc())
             )
             if active_job is not None:
-                if is_worker_active(active_job):
-                    # Genuinely active worker running right now
-                    metadata = active_job.job_metadata or {}
-                    total = active_job.total_count or 100
-                    processed = active_job.completed_count or 0
-                    progress = min(100, int((processed / total) * 100)) if total > 0 else 0
-                    return BatchWorkflowResponse(
-                        job_id=active_job.id,
-                        batch_job_id=active_job.id,
-                        status=active_job.status,
-                        total=total,
-                        processed=processed,
-                        completed=processed,
-                        failed=active_job.failed_count or 0,
-                        skipped=len(metadata.get("skipped", [])),
-                        insufficient_evidence=len(metadata.get("insufficient_evidence", [])),
-                        progress=progress,
-                        current_process=metadata.get("current_process"),
-                        message="Batch analysis is currently in progress.",
-                    )
-                else:
+                metadata = active_job.job_metadata or {}
+                total = active_job.total_count or 100
+                processed = active_job.completed_count or 0
+                progress = min(100, int((processed / total) * 100)) if total > 0 else 0
+
+                if not is_worker_active(active_job):
                     # Stale or abandoned job from a previous container lifecycle/restart.
-                    # Resume this existing job with a new background worker.
                     logger.info("Resuming abandoned/stale batch job %s", active_job.id)
-                    metadata = dict(active_job.job_metadata or {})
-                    metadata["last_heartbeat"] = datetime.utcnow().isoformat()
+                    metadata_dict = dict(metadata)
+                    metadata_dict["last_heartbeat"] = datetime.utcnow().isoformat()
                     active_job.status = "running"
-                    active_job.job_metadata = metadata
+                    active_job.job_metadata = metadata_dict
                     session.commit()
                     target_job_id = active_job.id
-                    total = active_job.total_count or 100
-                    processed = active_job.completed_count or 0
-                    progress = min(100, int((processed / total) * 100)) if total > 0 else 0
-
-                    def _run_resumed_worker(job_to_run: int):
-                        try:
-                            svc = BaselineAnalysisService(session_factory=session_factory)
-                            svc.run_baseline(batch_job_id=job_to_run)
-                        except Exception as exc:
-                            logger.error("Background batch worker failed for resumed job %s: %s", job_to_run, exc)
-
-                    _ACTIVE_WORKER_JOB_ID = target_job_id
-                    _ACTIVE_WORKER_THREAD = threading.Thread(target=_run_resumed_worker, args=(target_job_id,), daemon=True)
-                    _ACTIVE_WORKER_THREAD.start()
+                    _ensure_worker_running(
+                        target_job_id,
+                        session_factory=session_factory,
+                        baseline_service=baseline_service,
+                    )
 
                     return BatchWorkflowResponse(
                         job_id=target_job_id,
@@ -219,9 +219,24 @@ def analyze_all_processes(
                         processed=processed,
                         completed=processed,
                         progress=progress,
-                        current_process=metadata.get("current_process"),
+                        current_process=metadata_dict.get("current_process"),
                         message="Resumed previously interrupted batch analysis job.",
                     )
+
+                return BatchWorkflowResponse(
+                    job_id=active_job.id,
+                    batch_job_id=active_job.id,
+                    status=active_job.status,
+                    total=total,
+                    processed=processed,
+                    completed=processed,
+                    failed=active_job.failed_count or 0,
+                    skipped=len(metadata.get("skipped", [])),
+                    insufficient_evidence=len(metadata.get("insufficient_evidence", [])),
+                    progress=progress,
+                    current_process=metadata.get("current_process"),
+                    message="Batch analysis is currently in progress.",
+                )
 
             # No existing queued or running job -> create fresh BatchJob
             processes = session.scalars(
@@ -253,16 +268,11 @@ def analyze_all_processes(
             session.refresh(new_job)
             job_id = new_job.id
 
-            def _run_worker(target_job_id: int):
-                try:
-                    svc = BaselineAnalysisService(session_factory=session_factory)
-                    svc.run_baseline(batch_job_id=target_job_id)
-                except Exception as exc:
-                    logger.error("Background batch worker failed for job %s: %s", target_job_id, exc)
-
-            _ACTIVE_WORKER_JOB_ID = job_id
-            _ACTIVE_WORKER_THREAD = threading.Thread(target=_run_worker, args=(job_id,), daemon=True)
-            _ACTIVE_WORKER_THREAD.start()
+            _ensure_worker_running(
+                job_id,
+                session_factory=session_factory,
+                baseline_service=baseline_service,
+            )
 
             return BatchWorkflowResponse(
                 job_id=job_id,
@@ -275,7 +285,6 @@ def analyze_all_processes(
                 current_process=None,
                 message="Batch analysis job queued successfully.",
             )
-
 
 
 @router.get(
@@ -307,6 +316,14 @@ def get_active_batch_job(
             )
         if job is None:
             return None
+
+        # Auto-heal: If marked running/queued but no thread is alive in this container, resume worker
+        if job.status in ("queued", "running") and not is_worker_active(job):
+            _ensure_worker_running(
+                job.id,
+                session_factory=session_factory,
+                baseline_service=baseline_service,
+            )
 
         metadata = job.job_metadata or {}
         total = job.total_count or 100
@@ -353,6 +370,14 @@ def get_batch_job_status(
         if job is None:
             raise HTTPException(status_code=404, detail="Batch job {} not found".format(job_id))
 
+        # Auto-heal: If marked running/queued but no thread is alive in this container, resume worker
+        if job.status in ("queued", "running") and not is_worker_active(job):
+            _ensure_worker_running(
+                job.id,
+                session_factory=session_factory,
+                baseline_service=baseline_service,
+            )
+
         metadata = job.job_metadata or {}
         total = job.total_count or 100
         processed = job.completed_count or 0
@@ -380,4 +405,6 @@ def get_batch_job_status(
             finished_at=job.finished_at.isoformat() if job.finished_at else None,
             message="Batch job is {}".format(job.status),
         )
+
+
 
