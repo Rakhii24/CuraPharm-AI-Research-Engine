@@ -125,7 +125,7 @@ class BaselineAnalysisService:
             session_factory=session_factory,
         )
 
-    def run_baseline(self) -> BatchResult:
+    def run_baseline(self, batch_job_id: Optional[int] = None) -> BatchResult:
         """Process P001–P100 through research → analysis → scoring.
 
         Idempotent: skips already-completed processes. Resumable: picks up
@@ -135,46 +135,67 @@ class BaselineAnalysisService:
         Each process failure is isolated and recorded.
         """
         processes = self._load_baseline_processes()
-        batch_job, already_done = self._get_or_create_batch_job(processes)
-        result = BatchResult(batch_job_id=batch_job.id, total=len(processes))
+        if batch_job_id is not None:
+            active_job_id, already_done = self._get_batch_job_by_id(batch_job_id, processes)
+        else:
+            active_job_id, already_done = self._get_or_create_batch_job(processes)
 
-        for process in processes:
-            code = process.process_code
-            if code in already_done:
-                result.skipped += 1
-                result.process_results.append(ProcessResult(
-                    process_code=code, status="skipped",
-                    message="Already completed in previous run or has existing score",
-                ))
-                continue
+        result = BatchResult(batch_job_id=active_job_id, total=len(processes))
 
-            if self._has_valid_score(process.id):
-                result.skipped += 1
-                result.process_results.append(ProcessResult(
-                    process_code=code, status="skipped",
-                    message="Already has valid analysis and score",
-                ))
-                self._mark_process_done(batch_job.id, code, "skipped")
-                continue
+        try:
+            for process in processes:
+                code = process.process_code
+                if code in already_done:
+                    result.skipped += 1
+                    result.process_results.append(ProcessResult(
+                        process_code=code, status="skipped",
+                        message="Already completed in previous run or has existing score",
+                    ))
+                    continue
 
-            process_result = self._process_one(process)
-            result.process_results.append(process_result)
+                if self._has_valid_score(process.id):
+                    result.skipped += 1
+                    result.process_results.append(ProcessResult(
+                        process_code=code, status="skipped",
+                        message="Already has valid analysis and score",
+                    ))
+                    self._mark_process_done(active_job_id, code, "skipped")
+                    continue
 
-            if process_result.status == "completed":
-                result.completed += 1
-                self._mark_process_done(batch_job.id, code, "completed")
-            elif process_result.status == "insufficient_evidence":
-                result.insufficient_evidence += 1
-                self._mark_process_done(batch_job.id, code, "insufficient_evidence")
-            else:
-                result.failed += 1
-                self._mark_process_done(
-                    batch_job.id, code, "failed",
-                    error=process_result.message,
-                )
+                self._mark_process_active(active_job_id, code)
+                try:
+                    process_result = self._process_one(process)
+                except Exception as exc:
+                    logger.error("Individual process execution failed for %s: %s", code, exc)
+                    process_result = ProcessResult(
+                        process_code=code,
+                        status="failed",
+                        message=str(exc),
+                    )
 
-        self._finalize_batch_job(batch_job.id, result)
+                result.process_results.append(process_result)
+
+
+                if process_result.status == "completed":
+                    result.completed += 1
+                    self._mark_process_done(active_job_id, code, "completed")
+                elif process_result.status == "insufficient_evidence":
+                    result.insufficient_evidence += 1
+                    self._mark_process_done(active_job_id, code, "insufficient_evidence")
+                else:
+                    result.failed += 1
+                    self._mark_process_done(
+                        active_job_id, code, "failed",
+                        error=process_result.message,
+                    )
+
+            self._finalize_batch_job(active_job_id, result)
+        except Exception as exc:
+            logger.error("Unhandled error in batch run %s: %s", active_job_id, exc)
+            self._fail_batch_job(active_job_id, str(exc))
+            raise
         return result
+
 
     def _load_baseline_processes(self) -> List[Process]:
         """Load existing P001–P100 from the database in order."""
@@ -304,12 +325,28 @@ class BaselineAnalysisService:
                 message=str(exc),
             )
 
-    # ------------------------------------------------------------------
-    # BatchJob persistence helpers
-    # ------------------------------------------------------------------
+    def _get_batch_job_by_id(self, batch_job_id: int, processes) -> tuple:
+        """Find an existing batch job by ID, update it to running, and return (job_id, done_codes)."""
+        with self.session_factory() as session:
+            batch_job = session.get(BatchJob, batch_job_id)
+            if batch_job is None:
+                return self._get_or_create_batch_job(processes)
+            metadata = dict(batch_job.job_metadata or {})
+            metadata["last_heartbeat"] = utc_now().isoformat()
+            if batch_job.status in ("queued", "running"):
+                batch_job.status = "running"
+                if batch_job.started_at is None:
+                    batch_job.started_at = utc_now()
+            batch_job.job_metadata = metadata
+            session.commit()
+            target_id = batch_job.id
+            done_codes = set(metadata.get("completed", []))
+            done_codes.update(metadata.get("skipped", []))
+            done_codes.update(metadata.get("insufficient_evidence", []))
+            return target_id, done_codes
 
     def _get_or_create_batch_job(self, processes) -> tuple:
-        """Find a running baseline batch job to resume, or create a new one."""
+        """Find a running baseline batch job to resume, or create a new one, returning (job_id, done_codes)."""
         with self.session_factory() as session:
             existing = session.scalar(
                 select(BatchJob)
@@ -320,11 +357,15 @@ class BaselineAnalysisService:
                 .order_by(BatchJob.id.desc())
             )
             if existing is not None:
-                metadata = existing.job_metadata or {}
+                metadata = dict(existing.job_metadata or {})
+                metadata["last_heartbeat"] = utc_now().isoformat()
+                existing.job_metadata = metadata
+                session.commit()
+                target_id = existing.id
                 done_codes = set(metadata.get("completed", []))
                 done_codes.update(metadata.get("skipped", []))
                 done_codes.update(metadata.get("insufficient_evidence", []))
-                return existing, done_codes
+                return target_id, done_codes
 
             batch_job = BatchJob(
                 job_type=self.JOB_TYPE,
@@ -332,6 +373,8 @@ class BaselineAnalysisService:
                 total_count=len(processes),
                 started_at=utc_now(),
                 job_metadata={
+                    "current_process": None,
+                    "last_heartbeat": utc_now().isoformat(),
                     "completed": [],
                     "skipped": [],
                     "failed": {},
@@ -341,7 +384,20 @@ class BaselineAnalysisService:
             session.add(batch_job)
             session.commit()
             session.refresh(batch_job)
-            return batch_job, set()
+            return batch_job.id, set()
+
+
+    def _mark_process_active(self, batch_job_id: int, process_code: str):
+        """Record the process code currently being actively processed."""
+        with self.session_factory() as session:
+            batch_job = session.get(BatchJob, batch_job_id)
+            if batch_job is None:
+                return
+            metadata = dict(batch_job.job_metadata or {})
+            metadata["current_process"] = process_code
+            metadata["last_heartbeat"] = utc_now().isoformat()
+            batch_job.job_metadata = metadata
+            session.commit()
 
     def _mark_process_done(
         self, batch_job_id: int, process_code: str, status: str, error: str = None,
@@ -352,6 +408,7 @@ class BaselineAnalysisService:
             if batch_job is None:
                 return
             metadata = dict(batch_job.job_metadata or {})
+            metadata["last_heartbeat"] = utc_now().isoformat()
             if status in ("completed", "skipped", "insufficient_evidence"):
                 codes = list(metadata.get(status, []))
                 if process_code not in codes:
@@ -385,7 +442,28 @@ class BaselineAnalysisService:
             batch_job.completed_count = result.completed + result.skipped + result.insufficient_evidence
             batch_job.failed_count = result.failed
             batch_job.finished_at = utc_now()
+            metadata = dict(batch_job.job_metadata or {})
+            metadata["current_process"] = None
+            metadata["last_heartbeat"] = utc_now().isoformat()
+            batch_job.job_metadata = metadata
+            session.commit()
+
+    def _fail_batch_job(self, batch_job_id: int, error_message: str):
+        """Mark a batch job as failed due to an unhandled top-level exception."""
+        with self.session_factory() as session:
+            batch_job = session.get(BatchJob, batch_job_id)
+            if batch_job is None:
+                return
+            batch_job.status = "failed"
+            batch_job.error_message = error_message
+            batch_job.finished_at = utc_now()
+            metadata = dict(batch_job.job_metadata or {})
+            metadata["current_process"] = None
+            metadata["last_heartbeat"] = utc_now().isoformat()
+            batch_job.job_metadata = metadata
             session.commit()
 
 
+
 __all__ = ["BaselineAnalysisService", "BatchResult", "ProcessResult"]
+

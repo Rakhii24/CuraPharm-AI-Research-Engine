@@ -365,11 +365,12 @@ def test_api_endpoints_analyze_and_analyze_all(test_env):
         assert batch_resp.status_code == 200
         batch_data = batch_resp.json()
         assert batch_data["total"] == 100
-        assert batch_data["completed"] == 100
-        assert len(batch_data["process_results"]) == 100
+        assert batch_data["status"] in ("queued", "running", "completed")
+        assert (batch_data.get("job_id") or batch_data.get("batch_job_id")) is not None
     finally:
         app.dependency_overrides.clear()
         client.close()
+
 
 
 def test_expected_demonstrations_with_persisted_backend_data(test_env):

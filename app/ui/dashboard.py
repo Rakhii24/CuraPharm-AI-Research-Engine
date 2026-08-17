@@ -471,27 +471,37 @@ def _executive_query_bar(api: CuraPharmApi, items: List[Dict[str, Any]]) -> None
         st.markdown("**Executive Query Actions & Evaluator Shortcuts**")
         st.caption("One-click triggers to demonstrate the four core evaluation queries required by Modus Transformation AI:")
 
+        # Check for active batch job in session or database
+        active_job_id = st.session_state.get("active_batch_job_id")
+        active_job = None
+        if active_job_id:
+            try:
+                active_job = api.get_batch_status(active_job_id)
+            except ApiError:
+                active_job = None
+        else:
+            try:
+                latest = api.get_active_batch()
+                if latest and latest.get("status") in ("queued", "running"):
+                    active_job = latest
+                    st.session_state["active_batch_job_id"] = latest.get("job_id")
+            except ApiError:
+                active_job = None
+
+        is_running = bool(active_job and active_job.get("status") in ("queued", "running"))
+
         q_cols = st.columns([1.3, 1.3, 1.4, 1.4])
 
         with q_cols[0]:
-            if st.button("Analyse All Processes", type="primary", use_container_width=True):
-                with st.spinner("Executing systematic baseline batch analysis across the library..."):
-                    try:
-                        batch_res = api.analyze_all_processes()
-                        st.session_state["last_batch_result"] = batch_res
-                        _library(api, refresh=True)
-                        st.success(
-                            "Batch completed: Total: {}, Completed: {}, Skipped: {}, Insufficient: {}, Failed: {}".format(
-                                batch_res.get("total", 0),
-                                batch_res.get("completed", 0),
-                                batch_res.get("skipped", 0),
-                                batch_res.get("insufficient_evidence", 0),
-                                batch_res.get("failed", 0),
-                            )
-                        )
-                        st.rerun()
-                    except ApiError as exc:
-                        st.error("Batch Execution Error: {}".format(exc))
+            button_label = "⏳ Analysis Running..." if is_running else "Analyse All Processes"
+            if st.button(button_label, type="primary", use_container_width=True, disabled=is_running):
+                try:
+                    start_res = api.start_batch_analysis()
+                    job_id = start_res.get("job_id") or start_res.get("batch_job_id")
+                    st.session_state["active_batch_job_id"] = job_id
+                    st.rerun()
+                except ApiError as exc:
+                    st.error("Batch Start Error: {}".format(exc))
 
         with q_cols[1]:
             if st.button("Top 10 AI Potential", use_container_width=True):
@@ -511,6 +521,64 @@ def _executive_query_bar(api: CuraPharmApi, items: List[Dict[str, Any]]) -> None
                 st.session_state["selected_process_code"] = target_code
                 st.session_state["page"] = "Process Detail"
                 st.rerun()
+
+        # Render Live Progress Card when active or recently completed
+        if active_job:
+            status = active_job.get("status", "")
+            total = active_job.get("total", 100) or 100
+            processed = active_job.get("processed", 0)
+            progress = active_job.get("progress", 0)
+            curr = active_job.get("current_process")
+            successful = active_job.get("successful", 0)
+            skipped = active_job.get("skipped", 0)
+            insufficient = active_job.get("insufficient_evidence", 0)
+            failed = active_job.get("failed", 0)
+
+            if is_running:
+                st.markdown("---")
+                st.markdown(
+                    "**🔄 Batch Analysis Active** (Job `#{}` • Status: `{}`)".format(
+                        active_job.get("job_id") or active_job.get("batch_job_id"), status.upper()
+                    )
+                )
+                if curr:
+                    st.caption("🔬 Currently executing research, LLM inference, and scoring for: **`{}`**".format(curr))
+                else:
+                    st.caption("Initializing process pipeline...")
+
+                st.progress(min(1.0, max(0.0, float(progress) / 100.0)))
+
+                p_cols = st.columns(5)
+                p_cols[0].metric("Overall Progress", "{} / {}".format(processed, total), "{}%".format(progress))
+                p_cols[1].metric("Newly Completed", successful)
+                p_cols[2].metric("Idempotently Scored", skipped)
+                p_cols[3].metric("Insufficient Evidence", insufficient)
+                p_cols[4].metric("Failed Isolated", failed)
+
+                # Reactive polling pause and rerun
+                import time
+                time.sleep(2.0)
+                st.rerun()
+            elif status in ("completed", "completed_with_errors"):
+                if st.session_state.get("active_batch_job_id"):
+                    st.markdown("---")
+                    st.success(
+                        "✅ **Batch Analysis Complete** (Job `#{}`): Evaluated: {}/{} • Newly Completed: {} • Already Scored: {} • Insufficient Evidence: {} • Failed: {}".format(
+                            active_job.get("job_id") or active_job.get("batch_job_id"), processed, total, successful, skipped, insufficient, failed
+                        )
+                    )
+                    st.session_state["last_batch_result"] = active_job
+                    st.session_state["active_batch_job_id"] = None
+                    _library(api, refresh=True)
+            elif status == "failed":
+                if st.session_state.get("active_batch_job_id"):
+                    st.markdown("---")
+                    st.error(
+                        "❌ **Batch Analysis Failed** (Job `#{}`): {}".format(
+                            active_job.get("job_id") or active_job.get("batch_job_id"), active_job.get("error_message") or "Unknown error"
+                        )
+                    )
+                    st.session_state["active_batch_job_id"] = None
 
 
 # -----------------------------------------------------------------------------
@@ -617,15 +685,22 @@ def _dashboard(api: CuraPharmApi) -> None:
                 "`Research → Relevance Filtering → LLM Structured Output → Evidence Reference Validation → Phase 6 Scoring`."
             )
             last_batch = st.session_state.get("last_batch_result")
+            if not last_batch:
+                try:
+                    last_batch = api.get_active_batch()
+                except ApiError:
+                    last_batch = None
+
             if last_batch:
                 b_cols = st.columns(5)
-                b_cols[0].metric("Batch Job ID", last_batch.get("batch_job_id", "N/A"))
+                b_cols[0].metric("Batch Job ID", last_batch.get("job_id") or last_batch.get("batch_job_id", "N/A"))
                 b_cols[1].metric("Total Evaluated", last_batch.get("total", 0))
-                b_cols[2].metric("Newly Completed", last_batch.get("completed", 0))
+                b_cols[2].metric("Newly Completed", last_batch.get("successful") if last_batch.get("successful") is not None else last_batch.get("completed", 0))
                 b_cols[3].metric("Idempotently Skipped", last_batch.get("skipped", 0))
                 b_cols[4].metric("Insufficient Evidence", last_batch.get("insufficient_evidence", 0))
             else:
                 st.info("No active session batch run executed yet. Click 'Analyse All Processes' above to trigger.")
+
 
 
 # -----------------------------------------------------------------------------

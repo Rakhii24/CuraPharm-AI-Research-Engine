@@ -69,9 +69,36 @@ class BatchProcessResult(BaseModel):
 
 class BatchWorkflowResponse(BaseModel):
     batch_job_id: int
+    job_id: Optional[int] = None
+    status: str = "queued"
     total: int = 0
+    processed: int = 0
     completed: int = 0
     skipped: int = 0
     failed: int = 0
     insufficient_evidence: int = 0
+    progress: int = 0
+    current_process: Optional[str] = None
+    message: Optional[str] = None
     process_results: List[BatchProcessResult] = []
+
+
+class BatchJobStatusResponse(BaseModel):
+    job_id: int
+    batch_job_id: int
+    status: str
+    total: int = 0
+    processed: int = 0
+    completed: int = 0
+    successful: int = 0
+    skipped: int = 0
+    insufficient_evidence: int = 0
+    failed: int = 0
+    progress: int = 0
+    current_process: Optional[str] = None
+    error_message: Optional[str] = None
+    started_at: Optional[str] = None
+    finished_at: Optional[str] = None
+    message: Optional[str] = None
+    process_results: List[BatchProcessResult] = []
+

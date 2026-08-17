@@ -38,13 +38,44 @@ class CuraPharmApi:
         return self._request("POST", "/processes/analyze", json=payload)
 
     def analyze_all_processes(self) -> Dict[str, Any]:
+        """Trigger background batch analysis across baseline processes."""
         return self._request("POST", "/processes/analyze-all")
 
+    def start_batch_analysis(self) -> Dict[str, Any]:
+        """Alias for analyze_all_processes that starts an asynchronous batch job."""
+        return self.analyze_all_processes()
+
+    def get_batch_status(self, job_id: int) -> Dict[str, Any]:
+        """Retrieve real-time persistent status for a specific batch job."""
+        return self._request("GET", "/processes/batch/{}".format(job_id))
+
+    def get_active_batch(self) -> Optional[Dict[str, Any]]:
+        """Retrieve the currently active or most recent batch job."""
+        return self._request("GET", "/processes/batch/active")
+
+    def health_check(self) -> Dict[str, Any]:
+        """Check backend health status."""
+        return self._request("GET", "/health")
+
     def _request(self, method: str, path: str, **kwargs) -> Dict[str, Any]:
+        if path.startswith("/health"):
+            url = self.base_url.rsplit("/api", 1)[0] + path
+        else:
+            url = self.base_url + path
+
         try:
-            response = self.client.request(method, self.base_url + path, **kwargs)
+            response = self.client.request(method, url, **kwargs)
+        except httpx.ReadTimeout as exc:
+            raise ApiError("The backend request timed out while waiting for a response.") from exc
+        except httpx.ConnectTimeout as exc:
+            raise ApiError("Connection to the CuraPharm backend timed out.") from exc
+        except httpx.ConnectError as exc:
+            raise ApiError("Unable to connect to CuraPharm backend. Ensure the backend service is running.") from exc
+        except httpx.HTTPStatusError as exc:
+            raise ApiError("The backend returned an HTTP error (HTTP {}).".format(exc.response.status_code), exc.response.status_code) from exc
         except httpx.HTTPError as exc:
-            raise ApiError("The CuraPharm backend is unavailable. Start the backend and try again.") from exc
+            raise ApiError("The CuraPharm backend communication error: {}".format(exc)) from exc
+
         if response.is_success:
             return response.json()
         detail = self._detail(response)
@@ -69,3 +100,4 @@ class CuraPharmApi:
 
 
 __all__ = ["ApiError", "CuraPharmApi"]
+
