@@ -26,9 +26,18 @@ def _ensure_sqlite_parent(database_url: str):
 def create_database_engine(database_url: Optional[str] = None) -> Engine:
     """Build an SQLAlchemy engine from DATABASE_URL or the application settings."""
     resolved_url = database_url or get_settings().database_url
+    if resolved_url.startswith("postgres://"):
+        resolved_url = resolved_url.replace("postgres://", "postgresql://", 1)
+
     _ensure_sqlite_parent(resolved_url)
     connect_args = {"check_same_thread": False} if resolved_url.startswith("sqlite") else {}
-    return create_engine(resolved_url, connect_args=connect_args, future=True)
+    return create_engine(
+        resolved_url,
+        connect_args=connect_args,
+        pool_pre_ping=True,
+        future=True,
+    )
+
 
 
 engine = create_database_engine()

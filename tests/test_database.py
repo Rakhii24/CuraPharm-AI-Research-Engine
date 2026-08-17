@@ -1,6 +1,7 @@
 """Database schema, initialization, and restart persistence tests."""
 
-from sqlalchemy import inspect, select
+import pytest
+from sqlalchemy import func, inspect, select
 from sqlalchemy.orm import sessionmaker
 
 from app.database.base import Base
@@ -118,4 +119,88 @@ def test_records_persist_after_session_restart(tmp_path):
         assert persisted_process.evidence_links[0].evidence.excerpt == "Test-only evidence."
 
     restarted_engine.dispose()
+
+
+def test_postgres_url_normalization():
+    """Verify postgres:// URLs from Render are normalized to postgresql://."""
+    engine = create_database_engine("postgres://user:secret@localhost:5432/curapharm_db")
+    assert str(engine.url).startswith("postgresql://")
+    engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_startup_lifespan_seeds_empty_database(tmp_path, monkeypatch):
+    """Verify startup lifespan creates tables and seeds P001–P100 into an empty database."""
+    from app.main import app, lifespan
+    import app.database.session as session_module
+
+    db_path = tmp_path / "empty_startup.db"
+    db_url = "sqlite:///{}".format(db_path)
+    test_engine = create_database_engine(db_url)
+    test_session_factory = sessionmaker(bind=test_engine, autoflush=False, expire_on_commit=False)
+
+    monkeypatch.setattr(session_module, "engine", test_engine)
+    monkeypatch.setattr(session_module, "SessionLocal", test_session_factory)
+    monkeypatch.setattr("app.main.engine", test_engine)
+    monkeypatch.setattr("app.main.SessionLocal", test_session_factory)
+
+    async with lifespan(app):
+        pass
+
+    with test_session_factory() as session:
+        count = session.scalar(select(func.count(Process.id)))
+        assert count == 100
+
+    test_engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_startup_lifespan_preserves_existing_database(tmp_path, monkeypatch):
+    """Verify startup lifespan does not reseed or modify an already-populated database."""
+    from app.main import app, lifespan
+    import app.database.session as session_module
+
+    db_path = tmp_path / "populated_startup.db"
+    db_url = "sqlite:///{}".format(db_path)
+    test_engine = create_database_engine(db_url)
+    initialize_database(test_engine)
+    test_session_factory = sessionmaker(bind=test_engine, autoflush=False, expire_on_commit=False)
+
+    # Insert a single custom process
+    with test_session_factory() as session:
+        session.add(Process(process_code="P999", name="Custom Process", domain="Custom"))
+        session.commit()
+
+    monkeypatch.setattr(session_module, "engine", test_engine)
+    monkeypatch.setattr(session_module, "SessionLocal", test_session_factory)
+    monkeypatch.setattr("app.main.engine", test_engine)
+    monkeypatch.setattr("app.main.SessionLocal", test_session_factory)
+
+    async with lifespan(app):
+        pass
+
+    # Verify count remains 1 and was not overwritten/reseeded with 100 baseline items
+    with test_session_factory() as session:
+        count = session.scalar(select(func.count(Process.id)))
+        assert count == 1
+        custom = session.scalar(select(Process).where(Process.process_code == "P999"))
+        assert custom is not None
+
+    test_engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_startup_lifespan_raises_on_database_failure(monkeypatch):
+    """Verify database initialization failures are re-raised and not swallowed."""
+    from app.main import app, lifespan
+
+    def mock_failing_init(engine):
+        raise ConnectionError("Simulated database unreachable")
+
+    monkeypatch.setattr("app.main.initialize_database", mock_failing_init)
+
+    with pytest.raises(ConnectionError, match="Simulated database unreachable"):
+        async with lifespan(app):
+            pass
+
 
