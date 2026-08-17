@@ -608,7 +608,11 @@ def _dashboard(api: CuraPharmApi) -> None:
                 st.caption("Processes ranked by deterministic AI Opportunity score (0–100):")
                 try:
                     top_ai = api.list_processes(sort_by="ai_opportunity", sort_order="desc").get("items", [])
-                    ranked_ai = [i for i in top_ai if i.get("ai_opportunity") is not None][:10]
+                    ranked_ai = sorted(
+                        [i for i in top_ai if i.get("ai_opportunity") is not None],
+                        key=lambda x: (x.get("ai_opportunity") or 0, x.get("automation_potential") or 0),
+                        reverse=True,
+                    )[:10]
                     if ranked_ai:
                         st.dataframe(
                             [
@@ -635,7 +639,15 @@ def _dashboard(api: CuraPharmApi) -> None:
                 st.caption("Processes requiring predominant human expert judgment & oversight (Score ≥ 75):")
                 try:
                     top_human = api.list_processes(sort_by="human_involvement", sort_order="desc").get("items", [])
-                    ranked_human = [i for i in top_human if (i.get("human_involvement") or 0) >= 75][:10]
+                    ranked_human = sorted(
+                        [i for i in top_human if (i.get("human_involvement") or 0) >= 75],
+                        key=lambda x: (
+                            x.get("human_involvement") or 0,
+                            -(x.get("automation_potential") or 0),
+                            -(x.get("ai_opportunity") or 0),
+                        ),
+                        reverse=True,
+                    )[:10]
                     if ranked_human:
                         st.dataframe(
                             [
