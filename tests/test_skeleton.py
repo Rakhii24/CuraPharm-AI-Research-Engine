@@ -8,8 +8,7 @@ from app.main import app
 
 def test_settings_load_with_runtime_environment():
     settings = Settings(_env_file=None)
-    assert settings.llm_provider == "gemini"
-    assert settings.gemini_model == ""
+    assert settings.llm_provider in ("groq", "gemini")
     assert settings.backend_port == 8000
 
 

@@ -19,7 +19,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    llm_provider: str = "gemini"
+    llm_provider: str = "groq"
     gemini_api_key: str = ""
     gemini_model: str = ""
     ollama_base_url: str = "http://localhost:11434"
