@@ -71,7 +71,25 @@ class OpenAICompatibleProvider(LLMProvider):
         if self._api_key:
             headers["Authorization"] = f"Bearer {self._api_key}"
 
-        schema_json = json.dumps(response_model.model_json_schema(), indent=2)
+        if response_model.__name__ == "ProcessAnalysisResponse":
+            schema_instructions = (
+                "You MUST strictly output valid, raw JSON matching this structure:\n"
+                "{\n"
+                '  "business_purpose": "string",\n'
+                '  "key_activities": ["activity 1", "activity 2"],\n'
+                '  "current_challenges": ["challenge 1", "challenge 2"],\n'
+                '  "ai_opportunity": {"rating": 1-5, "reasoning": "string"},\n'
+                '  "automation_potential": {"rating": 1-5, "reasoning": "string"},\n'
+                '  "human_involvement": {"rating": 1-5, "reasoning": "string"},\n'
+                '  "technologies_ai_capabilities": ["capability 1", "capability 2"],\n'
+                '  "business_benefits": ["benefit 1", "benefit 2"],\n'
+                '  "risks": ["risk 1", "risk 2"],\n'
+                '  "evidence_references": [{"evidence_id": 1, "supported_claim": "string"}]\n'
+                "}"
+            )
+        else:
+            schema_instructions = f"You MUST strictly output valid, raw JSON conforming exactly to this JSON schema:\n{json.dumps(response_model.model_json_schema(), indent=2)}"
+
         payload = {
             "model": self.model_name,
             "messages": [
@@ -79,8 +97,7 @@ class OpenAICompatibleProvider(LLMProvider):
                     "role": "system",
                     "content": (
                         "You are a senior pharmaceutical and enterprise AI process intelligence analyst. "
-                        "You MUST strictly output valid, raw JSON conforming exactly to this JSON schema:\n"
-                        f"{schema_json}\n\n"
+                        f"{schema_instructions}\n\n"
                         "Do not wrap output in markdown fences. Do not output preamble, extra fields, or conversational text."
                     ),
                 },
@@ -110,6 +127,14 @@ class OpenAICompatibleProvider(LLMProvider):
                         f"{self.provider_name} authentication failed (HTTP {response.status_code}): {error_body}"
                     )
                 if response.status_code == 429:
+                    if "tokens per day" in error_body.lower() or "tpd" in error_body.lower():
+                        if payload["model"] == "openai/gpt-oss-120b":
+                            payload["model"] = "openai/gpt-oss-20b"
+                            continue
+                        elif payload["model"] == "openai/gpt-oss-20b":
+                            payload["model"] = "qwen/qwen3.6-27b"
+                            continue
+
                     if self._is_permanent_quota_error(error_body):
                         raise OpenAIProviderQuotaError(
                             f"{self.provider_name} quota exhausted (HTTP 429): {error_body}"

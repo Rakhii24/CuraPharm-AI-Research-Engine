@@ -29,9 +29,9 @@ Keep these dimensions separate:
 2. Automation potential: how much execution could be automated under controls.
 3. Human involvement: where expert judgment, accountability, ethics, or oversight remains necessary.
 
-Return only the requested structured response. Ratings are preliminary 1-5
+Return only the requested structured JSON response. Ratings are preliminary 1-5
 dimension assessments, not final business scores; final deterministic scoring is
-performed outside Gemini in a later phase.
+performed outside the LLM in a later phase.
 
 Research status: {research_status}
 

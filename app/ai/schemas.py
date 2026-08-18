@@ -10,10 +10,8 @@ class DimensionAssessment(BaseModel):
 
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
-    rating: int = Field(default=3, ge=1, le=5)
-    reasoning: str = Field(
-        default="Dimension assessment grounded in operational evidence and process structure."
-    )
+    rating: int = Field(ge=1, le=5)
+    reasoning: str = Field(min_length=1)
 
 
 class EvidenceReference(BaseModel):
@@ -22,12 +20,11 @@ class EvidenceReference(BaseModel):
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     evidence_id: int = Field(
-        default=1,
         gt=0,
         validation_alias=AliasChoices("evidence_id", "id", "evidenceId"),
     )
     supported_claim: str = Field(
-        default="Evidence supports operational transformation.",
+        min_length=1,
         validation_alias=AliasChoices(
             "supported_claim", "claim", "claim_text", "supportedClaim"
         ),
@@ -39,30 +36,15 @@ class ProcessAnalysisResponse(BaseModel):
 
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
-    business_purpose: str = Field(
-        default="Enterprise pharmaceutical process execution."
-    )
-    key_activities: List[str] = Field(default_factory=list)
-    current_challenges: List[str] = Field(default_factory=list)
-    ai_opportunity: DimensionAssessment = Field(
-        default_factory=lambda: DimensionAssessment(
-            rating=3, reasoning="Moderate AI opportunity."
-        )
-    )
-    automation_potential: DimensionAssessment = Field(
-        default_factory=lambda: DimensionAssessment(
-            rating=3, reasoning="Moderate automation potential."
-        )
-    )
-    human_involvement: DimensionAssessment = Field(
-        default_factory=lambda: DimensionAssessment(
-            rating=3, reasoning="Human oversight required."
-        )
-    )
-    technologies_ai_capabilities: List[str] = Field(default_factory=list)
-    business_benefits: List[str] = Field(default_factory=list)
-    risks: List[str] = Field(default_factory=list)
+    business_purpose: str = Field(min_length=1)
+    key_activities: List[str] = Field(min_length=1)
+    current_challenges: List[str] = Field(min_length=1)
+    ai_opportunity: DimensionAssessment
+    automation_potential: DimensionAssessment
+    human_involvement: DimensionAssessment
+    technologies_ai_capabilities: List[str] = Field(min_length=1)
+    business_benefits: List[str] = Field(min_length=1)
+    risks: List[str] = Field(min_length=1)
     evidence_references: List[EvidenceReference] = Field(default_factory=list)
     confidence: str = Field(default="medium")
     limitations: List[str] = Field(default_factory=list)
-

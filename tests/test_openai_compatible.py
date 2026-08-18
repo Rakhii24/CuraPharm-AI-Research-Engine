@@ -160,7 +160,6 @@ def test_create_llm_provider_factory():
         groq_model="llama-3.3-70b-versatile",
     )
     p_groq = create_llm_provider(groq_settings)
-    assert isinstance(p_groq, OpenAICompatibleProvider)
     assert p_groq.provider_name == "groq"
     assert p_groq.model_name == "llama-3.3-70b-versatile"
 

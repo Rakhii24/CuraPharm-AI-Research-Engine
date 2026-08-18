@@ -68,15 +68,28 @@ class PubMedProvider(ResearchProvider):
             if (not isinstance(ids, list) or not ids) and context:
                 import re
                 name = str(context.get("name", "")).strip()
+                domain = str(context.get("domain", "")).strip()
                 if name:
-                    clean_name = " ".join(re.findall(r"[a-zA-Z0-9]+", name))
-                    fallback_term = '"{}" OR ({} AND pharmaceutical)'.format(clean_name, clean_name)
-                    fallback_response = self.http.get(
-                        EUTILS_BASE_URL + "/esearch.fcgi",
-                        self._params({"term": fallback_term, "retmax": self.settings.pubmed_max_results}),
-                    )
-                    fallback_payload = fallback_response.json()
-                    ids = fallback_payload.get("esearchresult", {}).get("idlist", [])
+                    clean_words = [w for w in re.findall(r"[a-zA-Z0-9]+", name) if len(w) > 1]
+                    clean_name = " ".join(clean_words)
+                    domain_kw = "clinical" if "Clinical" in domain else "pharmaceutical"
+                    fallback_queries = [
+                        '("{}") OR ({} AND {})'.format(clean_name, clean_name, domain_kw),
+                        clean_name,
+                    ]
+                    if len(clean_words) > 2:
+                        core_phrase = " ".join(clean_words[:2])
+                        fallback_queries.append('("{}") OR ({} AND {})'.format(core_phrase, core_phrase, domain_kw))
+
+                    for fb_term in fallback_queries:
+                        fallback_response = self.http.get(
+                            EUTILS_BASE_URL + "/esearch.fcgi",
+                            self._params({"term": fb_term, "retmax": self.settings.pubmed_max_results}),
+                        )
+                        fallback_payload = fallback_response.json()
+                        ids = fallback_payload.get("esearchresult", {}).get("idlist", [])
+                        if isinstance(ids, list) and ids:
+                            break
 
             if not isinstance(ids, list) or not ids:
                 return []
