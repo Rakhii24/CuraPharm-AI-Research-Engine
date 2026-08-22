@@ -327,6 +327,7 @@ def _style() -> None:
             color: #ffffff;
             letter-spacing: -0.02em;
             margin: 0 0 0.35rem 0;
+            text-align: center;
         }
         .corp-subtitle {
             font-size: 0.88rem;
@@ -424,7 +425,10 @@ def _header() -> None:
             <div class="corp-brand-tag">MODUS TRANSFORMATION AI • ENTERPRISE INTELLIGENCE</div>
             <div class="corp-brand-status">Production Engine • SQLite Grounded</div>
           </div>
-          <h1 class="corp-title">100-Process AI Research & Intelligence Engine</h1>
+          <h1 class="corp-title">
+            <div>CuraPharm</div>
+            <div>100-Process AI Research & Intelligence Engine</div>
+          </h1>
           <p class="corp-subtitle">
             Systematic, evidence-grounded evaluation of enterprise business processes. Combines live external literature
             research, Pydantic structured intelligence, citation verification, and deterministic 3-dimensional Phase 6 scoring.
